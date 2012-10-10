@@ -1,4 +1,4 @@
-gagan-gaja
+HadoopStack
 ==========
 
 Hadoop on Cloud
