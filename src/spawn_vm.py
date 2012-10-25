@@ -7,6 +7,10 @@ print region_var
 conn = EC2Connection('demo', 'demo', region=region_var, is_secure=False, path="/services/Cloud")
 print conn
 
+#This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
+
+default_image_id = "ami-00000010"
+
 def connect_cloud(access_key, secret_key, url):
     '''
     Function: connect_cloud(access_key, secret_key, url)
@@ -40,7 +44,7 @@ def gen_save_keypair():
     key_pair.save("/tmp/HadoopStack")
     return True
 
-def spawn_instances(number, flavor, keypair, region, image, sec_group):
+def spawn_instances(number, flavor, keypair, region, image_id=default_image_id, sec_group):
     '''
     Function: spawn_instances(number, flavor)
     -----------------------------------
