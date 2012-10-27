@@ -1,4 +1,4 @@
-from boto.ec2.connection import EC2Connection 
+from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
@@ -37,7 +37,7 @@ def connect_cloud(access_key, secret_key, url):
     @todo: add support for other cloud providers
     
     '''
-    
+    global conn
     url_endpoint = url.split('/')[2]
     url_port = url.split(':')[2].split('/')[0]
     url_path = url.split(url_port)[1]
@@ -53,15 +53,13 @@ def connect_cloud(access_key, secret_key, url):
                                  path=url_path)
     return conn;
 
-def gen_save_keypair(conn):
+def gen_save_keypair():
     '''
     Function: gen_save_keypair()
     ----------------------- 
     This function will generate a temporary keypair to be used by
     HadoopStack and save it in /tmp/HadoopStack directory.
-    
-    @param conn: cloud connection descriptor 
-    
+        
     @return: bool: true or false, depicting success or failure respectively.
     
     @todo: Need to find a way to save this key securely. May be in per process
@@ -69,17 +67,18 @@ def gen_save_keypair(conn):
     
     '''
     
+    
+    
     key_pair = conn.create_key_pair("hadoopstack")
     key_pair.save("/tmp/HadoopStack")
     return True
 
-def spawn_instances(conn, number, flavor, keypair, region, image_id=default_image_id, sec_group):
+def spawn_instances(number, flavor, keypair, region, image_id, sec_group):
     '''
     Function: spawn_instances(number, flavor)
     -----------------------------------
     This function spawns virtual machines.
     
-    @param conn: cloud connection descriptor.
     @param number: The number of virtual machines to boot.
     @param flavor: The flavor of virtual machine, e.g. - m1.small etc.
     @param keypair: SSH keypair to be associated with each instance.
@@ -91,7 +90,26 @@ def spawn_instances(conn, number, flavor, keypair, region, image_id=default_imag
     
     '''
     
-def input_size_estimation(conn, location_url):
+def create_sec_group():
+    '''
+    Function: create_sec_group()
+    ---------------------------
+    It creates a default "hadoopstack" security group for booting VMs.
+    
+    @return: id of the security group.
+     
+    '''
+    list_sec_groups = conn.get_all_security_groups(["HadoopStack"])
+    
+    if len(list_sec_groups) > 0:
+        return list_sec_groups[0].id
+    
+    sec_group = conn.create_security_group("HadoopStack",
+                "Default security group for HadoopStack VMs")
+    
+    return sec_group.id
+    
+def input_size_estimation(location_url):
     '''
     Function: input_size_estimation(location_url)
     ---------------------------------------------
@@ -104,22 +122,24 @@ def input_size_estimation(conn, location_url):
     avg_size_each_object = mean of n random objects(e.g. n=5)
     total_estimated_size = avg_size_each_object * no_of_objects
     
-    @param conn: cloud connection descriptor
     @param location_url: location of input data(s3://, http://, hdfs:// etc.)
     
     @return: input_size in Bytes.
     
     '''
 
-def estimate_run_instances(conn, input_size, deadline):
+def estimate_run_instances(input_size, deadline):
     '''
     Function: estimate_run_instances(conn_desc)
     -------------------------------------------
     This function estimates the number and flavor of instances based on the
     input size and deadline of the project.
-    
-    @param conn_desc: cloud connection descriptor
-    
+        
     @return: 
     
     '''
+    
+    instance_flavor = "m1.small"
+    instance_number = "2"
+
+    
