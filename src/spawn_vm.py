@@ -53,12 +53,14 @@ def connect_cloud(access_key, secret_key, url):
                                  path=url_path)
     return conn;
 
-def gen_save_keypair():
+def gen_save_keypair(conn):
     '''
     Function: gen_save_keypair()
     ----------------------- 
     This function will generate a temporary keypair to be used by
     HadoopStack and save it in /tmp/HadoopStack directory.
+    
+    @param conn: cloud connection descriptor 
     
     @return: bool: true or false, depicting success or failure respectively.
     
@@ -71,12 +73,13 @@ def gen_save_keypair():
     key_pair.save("/tmp/HadoopStack")
     return True
 
-def spawn_instances(number, flavor, keypair, region, image_id=default_image_id, sec_group):
+def spawn_instances(conn, number, flavor, keypair, region, image_id=default_image_id, sec_group):
     '''
     Function: spawn_instances(number, flavor)
     -----------------------------------
     This function spawns virtual machines.
     
+    @param conn: cloud connection descriptor.
     @param number: The number of virtual machines to boot.
     @param flavor: The flavor of virtual machine, e.g. - m1.small etc.
     @param keypair: SSH keypair to be associated with each instance.
@@ -88,7 +91,7 @@ def spawn_instances(number, flavor, keypair, region, image_id=default_image_id, 
     
     '''
     
-def input_size_estimation(location_url):
+def input_size_estimation(conn, location_url):
     '''
     Function: input_size_estimation(location_url)
     ---------------------------------------------
@@ -101,6 +104,7 @@ def input_size_estimation(location_url):
     avg_size_each_object = mean of n random objects(e.g. n=5)
     total_estimated_size = avg_size_each_object * no_of_objects
     
+    @param conn: cloud connection descriptor
     @param location_url: location of input data(s3://, http://, hdfs:// etc.)
     
     @return: input_size in Bytes.
