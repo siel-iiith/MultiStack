@@ -4,9 +4,11 @@ from boto.ec2.regioninfo import EC2RegionInfo
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
 print region_var
 
-#This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
-
+# This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
 default_image_id = "ami-00000010"
+# The default minimum value of the no. of VMs to boot
+default_min_vm = 1
+
 
 def cloud_provider(url):
     '''
@@ -32,7 +34,7 @@ def connect_cloud(access_key, secret_key, url):
     @param secret_key: The EC2 secret key.
     @param url: The EC2 API endpoint of the cloud.
     
-    @return: The connection descriptor.
+    @return: NULL
     
     @todo: add support for other cloud providers
     
@@ -49,9 +51,9 @@ def connect_cloud(access_key, secret_key, url):
             conn = EC2Connection(access_key,
                                  secret_key,
                                  region=region_var,
-                                 is_secure="false",
+                                 is_secure=False,
                                  path=url_path)
-    return conn;
+    return
 
 def gen_save_keypair():
     '''
@@ -67,13 +69,15 @@ def gen_save_keypair():
     
     '''
     
-    
+    list_key_pairs = conn.get_all_key_pairs("hadoopstack")
+    if len(list_key_pairs) > 0:
+        return
     
     key_pair = conn.create_key_pair("hadoopstack")
     key_pair.save("/tmp/HadoopStack")
-    return True
+    return
 
-def spawn_instances(number, flavor, keypair, region, image_id, sec_group):
+def spawn_instances(image_id, number, keypair, sec_group, flavor):
     '''
     Function: spawn_instances(number, flavor)
     -----------------------------------
@@ -82,13 +86,19 @@ def spawn_instances(number, flavor, keypair, region, image_id, sec_group):
     @param number: The number of virtual machines to boot.
     @param flavor: The flavor of virtual machine, e.g. - m1.small etc.
     @param keypair: SSH keypair to be associated with each instance.
-    @param region: Region in which instance will be spawned.
     @param image: Image to be booted.
-    @param sec_group: Security group the instances are going to be associated with.
+    @param sec_group: list of security groups, the instances are going to be associated with.
     
     @return 
     
     '''
+    
+    return conn.run_instances(default_image_id,
+                              int(default_min_vm),
+                              int(number),
+                              keypair,
+                              sec_group,
+                              flavor)
     
 def create_sec_group():
     '''
@@ -96,18 +106,20 @@ def create_sec_group():
     ---------------------------
     It creates a default "hadoopstack" security group for booting VMs.
     
-    @return: id of the security group.
+    @return: security group.
      
     '''
-    list_sec_groups = conn.get_all_security_groups(["HadoopStack"])
-    
-    if len(list_sec_groups) > 0:
-        return list_sec_groups[0].id
-    
-    sec_group = conn.create_security_group("HadoopStack",
+    try:
+        list_sec_groups = conn.get_all_security_groups(["hadoopstack"])
+        print list_sec_groups
+        if len(list_sec_groups) > 0:
+            return list_sec_groups[0]
+
+    except:
+        sec_group = conn.create_security_group("hadoopstack",
                 "Default security group for HadoopStack VMs")
     
-    return sec_group.id
+    return sec_group.id    
     
 def input_size_estimation(location_url):
     '''
@@ -141,5 +153,9 @@ def estimate_run_instances(input_size, deadline):
     
     instance_flavor = "m1.small"
     instance_number = "2"
-
     
+    spawn_instances(default_image_id,
+                    instance_number,
+                    "hadoopstack",
+                    ["hadoopstack"],
+                    instance_flavor,)
