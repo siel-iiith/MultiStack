@@ -4,12 +4,22 @@ from boto.ec2.regioninfo import EC2RegionInfo
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
 print region_var
 
-conn = EC2Connection('demo', 'demo', region=region_var, is_secure=False, path="/services/Cloud")
-print conn
-
 #This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
 
 default_image_id = "ami-00000010"
+
+def cloud_provider(url):
+    '''
+    Function: cloud_provider()
+    --------------------------
+    Identify the cloud provider from the URL.
+    
+    @param url: endpoint url
+    
+    @return: a provider name(aws, hpcloud, openstack etc.)
+    '''
+    
+    return "openstack"
 
 def connect_cloud(access_key, secret_key, url):
     '''
@@ -24,7 +34,24 @@ def connect_cloud(access_key, secret_key, url):
     
     @return: The connection descriptor.
     
+    @todo: add support for other cloud providers
+    
     '''
+    
+    url_endpoint = url.split('/')[2]
+    url_port = url.split(':')[2].split('/')[0]
+    url_path = url.split(url_port)[1]
+    url_protocol = url.split(":")[0]
+    provider = cloud_provider(url)
+    
+    if provider == "openstack":
+        if url_protocol == "http":
+            conn = EC2Connection(access_key,
+                                 secret_key,
+                                 region=region_var,
+                                 is_secure="false",
+                                 path=url_path)
+    return conn;
 
 def gen_save_keypair():
     '''
@@ -58,5 +85,37 @@ def spawn_instances(number, flavor, keypair, region, image_id=default_image_id, 
     @param sec_group: Security group the instances are going to be associated with.
     
     @return 
+    
+    '''
+    
+def input_size_estimation(location_url):
+    '''
+    Function: input_size_estimation(location_url)
+    ---------------------------------------------
+    For the VM flavor and no. estimation we need the input size. This function
+    uses basic logic to guess the approximate size of huge datasets.
+    
+    e.g - for one bucket(dir) and multiple files kind of data, this function
+    calculates the avg. size of each object by using 5 random objects.
+    
+    avg_size_each_object = mean of n random objects(e.g. n=5)
+    total_estimated_size = avg_size_each_object * no_of_objects
+    
+    @param location_url: location of input data(s3://, http://, hdfs:// etc.)
+    
+    @return: input_size in Bytes.
+    
+    '''
+
+def estimate_run_instances(conn, input_size, deadline):
+    '''
+    Function: estimate_run_instances(conn_desc)
+    -------------------------------------------
+    This function estimates the number and flavor of instances based on the
+    input size and deadline of the project.
+    
+    @param conn_desc: cloud connection descriptor
+    
+    @return: 
     
     '''
