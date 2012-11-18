@@ -3,6 +3,7 @@
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 from time import sleep
+import os
 import paramiko
 
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
@@ -12,9 +13,9 @@ print region_var
 default_image_id = "ami-00000010"
 # The default minimum value of the no. of VMs to boot
 default_min_vm = 1
-default_key_location="/home/sahni/projects/HadoopStack/src/"
+default_key_location = os.path.expanduser("~/.hadoopstack")
 
-script_hadoop_install="https://raw.github.com/dharmeshkakadia/Hadoop-Scripts/master/hadoop_install.sh"
+script_hadoop_install = "https://raw.github.com/dharmeshkakadia/Hadoop-Scripts/master/hadoop_install.sh"
 
 master_instance_flavor = "m1.tiny"
 master_instance_number = 1
@@ -88,6 +89,8 @@ def gen_save_keypair():
         return
 
     key_pair = conn.create_key_pair("hadoopstack")
+    if not os.path.exists(default_key_location):
+        os.mkdir(os.path.expanduser("~/.hadoopstack"))
     key_pair.save(default_key_location)
     return
 
@@ -167,7 +170,9 @@ def refresh(resv_obj):
     '''
     Function: refresh(resv_obj)
     ---------------------------
-    Most of the object values have to be updated to get the most recent values. This function takes care of it. As of now, only updated reservation objects are required.
+    Most of the object values have to be updated to get the most recent values.
+    This function takes care of it. As of now, only updated reservation objects
+    are required.
 
     @param resv_obj: Its the reservation object
     
@@ -184,7 +189,7 @@ def estimate_run_instances(input_size, deadline):
     '''
     Function: estimate_run_instances(conn_desc)
     -------------------------------------------
-    This function estimates the number and flavor of instances based on the
+    This function estimates the number and flavour of instances based on the
     input size and deadline of the project.
 
     @return:
@@ -215,19 +220,56 @@ def estimate_run_instances(input_size, deadline):
             "hadoopstack",
             ["hadoopstack"],
             slaves_instance_flavor)
-
+    
+    configure_instances(master_resv_obj, slaves_resv_obj,
+                        master_elastic_address.public_ip.encode('ascii',
+                                                                'ignore'),
+                        script_hadoop_install)
+    
     return
 
 
-def configure_instances(master_resv_obj, slave_resv_obj, script_location):
+def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, script_location):
     '''
     Function: configure_system(master_resv_obj, slave_resv_obj)
     --------------------------------------------
-    This function accesses and executes the script, specified by script_location
-    , on master.
-
+    This function accesses and executes the script, specified by 
+    script_location, on master.
+    
+    @type Reservation: boto.ec2.instance.Reservation object
     @param master_resv_obj: Master node reservation object
+    
+    @type Reservation: boto.ec2.instance.Reservation object 
     @param slave_resv_obj: Slave nodes reservation object
-    @param script_location: Location of the script to be executed on the master.
+    
+    @type value: string
+    @param master_public_ip: Public IP of master node
+    
+    @type value: string
+    @param script_location: Location of the script to be executed on the master
 
     '''
+    
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    key_location = default_key_location + "/hadoopstack.pem"
+    while(True):
+        try:
+            ssh.connect(hostname=master_public_ip,
+                        username="root",
+                        key_filename=key_location)
+        
+        except:
+            sleep(1)
+            continue
+        
+        break
+
+    sftp = ssh.open_sftp()
+    sftp.put(key_location, "/root/hadoopstack.pem")
+    sftp.close()
+    
+    stdin, stdout, stderr = ssh.exec_command('ls')
+    for line in stdout:
+        print line
+    ssh.close()
