@@ -5,6 +5,7 @@ from boto.ec2.regioninfo import EC2RegionInfo
 from time import sleep
 import os
 import paramiko
+import socket
 
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
 print region_var
@@ -259,9 +260,12 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
                         username="root",
                         key_filename=key_location)
         
-        except:
-            sleep(1)
-            continue
+        except socket.error, (value, message):
+            if value == 113:
+                sleep(1)
+                continue
+            else:
+                print "socket.error: [Errno", value, "]", message 
         
         break
 
