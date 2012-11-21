@@ -8,8 +8,6 @@ import paramiko
 import socket
 import argparse
 
-region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
-print region_var
 
 # This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
 default_image_id = "ami-00000010"
@@ -131,6 +129,10 @@ def connect_cloud(cred_dict):
     url_path = url.split(url_port)[1]
     url_protocol = url.split(":")[0]
     provider = cloud_provider(url)
+    
+    # A default region is required by boto for initiating connection.
+    region_var = EC2RegionInfo(name="tmp.hadoopstack", endpoint=url_endpoint)
+    print region_var
 
     if provider == "openstack":
         if url_protocol == "http":
@@ -139,6 +141,7 @@ def connect_cloud(cred_dict):
                     region=region_var,
                     is_secure=False,
                     path=url_path)
+            print conn.get_all_images()
     return
 
 
