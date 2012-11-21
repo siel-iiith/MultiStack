@@ -24,10 +24,60 @@ slaves_instance_flavor = "m1.tiny"
 slaves_instance_number = 1
 
 
+def get_credentials_config_file(cred_list):
+    '''
+    It fetches the EC2 credentials from hadoopstack's configuration file.
+    default - ~/.hadoopstack/config
+    
+    @type cred_list: dictionary
+    @param cred_list: A dictionary of credentials fetched from environment
+    variables.
+    
+    @rtype: Dictionary
+    @return: Updated dictionary
+    '''
+    
+    if not os.path.exists(os.path.expanduser('~/.hadoopstack/config')):
+        return cred_list
+    
+    conf_fd = open(os.path.expanduser('~/.hadoopstack/config'), 'r')
+    conf_content = conf_fd.readlines()
+    for parameter in conf_content:
+        option = parameter.split('=')[0]
+        value = parameter.split('=')[1]
+        if option == "EC2_ACCESS_KEY" or option == "ec2_access_key":
+            cred_list['ec2_access_key'] = value
+        elif option == "EC2_SECRET_KEY" or option == "ec2_secret_key":
+            cred_list['ec2_secret_key'] = value
+        elif option == "EC2_URL" or option == "ec2_url":
+            cred_list['ec2_url'] = value
+            
+    return cred_list
+
+
+def get_credentials_env():
+    '''
+    Fetches the EC2 credentials from the environment.
+    
+    @rtype: Dictionary
+    @return: A dictionary of the fetched credentials.
+    '''
+    
+    cred_list = dict()
+    if os.environ.has_key("EC2_ACCESS_KEY"):
+        cred_list['ec2_access_key'] = os.environ["EC2_ACCESS_KEY"]
+    
+    if os.environ.has_key("EC2_SECRET_KEY"):
+        cred_list['ec2_secret_key'] = os.environ["EC2_SECRET_KEY"]
+        
+    if os.environ.has_key("EC2_URL"):
+        cred_list['ec2_url'] = os.environ["EC2_URL"]
+        
+    return cred_list
+   
+
 def cloud_provider(url):
     '''
-    Function: cloud_provider()
-    --------------------------
     Identify the cloud provider from the URL.
 
     @param url: endpoint url
@@ -40,8 +90,6 @@ def cloud_provider(url):
 
 def connect_cloud(access_key, secret_key, url):
     '''
-    Function: connect_cloud(access_key, secret_key, url)
-    ----------------------------------------------------
     This function uses ec2 API to connect to various cloud providers.
     Note that, it only connects to one cloud at a time.
 
@@ -73,8 +121,6 @@ def connect_cloud(access_key, secret_key, url):
 
 def gen_save_keypair():
     '''
-    Function: gen_save_keypair()
-    -----------------------
     This function will generate a temporary keypair to be used by
     HadoopStack and save it in /tmp/HadoopStack directory.
 
@@ -98,8 +144,6 @@ def gen_save_keypair():
 
 def spawn_instances(image_id, number, keypair, sec_group, flavor):
     '''
-    Function: spawn_instances(number, flavor)
-    -----------------------------------
     This function spawns virtual machines.
 
     @param number: The number of virtual machines to boot.
@@ -123,8 +167,6 @@ def spawn_instances(image_id, number, keypair, sec_group, flavor):
 
 def create_sec_group():
     '''
-    Function: create_sec_group()
-    ---------------------------
     It creates a default "hadoopstack" security group for booting VMs.
 
     @return: security group.
@@ -149,8 +191,6 @@ def create_sec_group():
 
 def input_size_estimation(location_url):
     '''
-    Function: input_size_estimation(location_url)
-    ---------------------------------------------
     For the VM flavor and no. estimation we need the input size. This function
     uses basic logic to guess the approximate size of huge datasets.
 
@@ -169,8 +209,6 @@ def input_size_estimation(location_url):
 
 def refresh(resv_obj):
     '''
-    Function: refresh(resv_obj)
-    ---------------------------
     Most of the object values have to be updated to get the most recent values.
     This function takes care of it. As of now, only updated reservation objects
     are required.
@@ -188,8 +226,6 @@ def refresh(resv_obj):
 
 def estimate_run_instances(input_size, deadline):
     '''
-    Function: estimate_run_instances(conn_desc)
-    -------------------------------------------
     This function estimates the number and flavour of instances based on the
     input size and deadline of the project.
 
@@ -232,8 +268,6 @@ def estimate_run_instances(input_size, deadline):
 
 def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, script_location):
     '''
-    Function: configure_system(master_resv_obj, slave_resv_obj)
-    --------------------------------------------
     This function accesses and executes the script, specified by 
     script_location, on master.
     
@@ -277,3 +311,5 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
     for line in stdout:
         print line
     ssh.close()
+
+print get_credentials_config_file(get_credentials_env())
