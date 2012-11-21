@@ -24,13 +24,13 @@ slaves_instance_flavor = "m1.tiny"
 slaves_instance_number = 1
 
 
-def get_credentials_config_file(cred_list):
+def get_credentials_config_file(cred_dict):
     '''
     It fetches the EC2 credentials from hadoopstack's configuration file.
     default - ~/.hadoopstack/config
     
-    @type cred_list: dictionary
-    @param cred_list: A dictionary of credentials fetched from environment
+    @type cred_dict: dictionary
+    @param cred_dict: A dictionary of credentials fetched from environment
     variables.
     
     @rtype: Dictionary
@@ -38,7 +38,7 @@ def get_credentials_config_file(cred_list):
     '''
     
     if not os.path.exists(os.path.expanduser('~/.hadoopstack/config')):
-        return cred_list
+        return cred_dict
     
     conf_fd = open(os.path.expanduser('~/.hadoopstack/config'), 'r')
     conf_content = conf_fd.readlines()
@@ -46,13 +46,13 @@ def get_credentials_config_file(cred_list):
         option = parameter.split('=')[0]
         value = parameter.split('=')[1]
         if option == "EC2_ACCESS_KEY" or option == "ec2_access_key":
-            cred_list['ec2_access_key'] = value
+            cred_dict['ec2_access_key'] = value
         elif option == "EC2_SECRET_KEY" or option == "ec2_secret_key":
-            cred_list['ec2_secret_key'] = value
+            cred_dict['ec2_secret_key'] = value
         elif option == "EC2_URL" or option == "ec2_url":
-            cred_list['ec2_url'] = value
+            cred_dict['ec2_url'] = value
             
-    return cred_list
+    return cred_dict
 
 
 def get_credentials_env():
@@ -63,17 +63,17 @@ def get_credentials_env():
     @return: A dictionary of the fetched credentials.
     '''
     
-    cred_list = dict()
+    cred_dict = dict()
     if os.environ.has_key("EC2_ACCESS_KEY"):
-        cred_list['ec2_access_key'] = os.environ["EC2_ACCESS_KEY"]
+        cred_dict['ec2_access_key'] = os.environ["EC2_ACCESS_KEY"]
     
     if os.environ.has_key("EC2_SECRET_KEY"):
-        cred_list['ec2_secret_key'] = os.environ["EC2_SECRET_KEY"]
+        cred_dict['ec2_secret_key'] = os.environ["EC2_SECRET_KEY"]
         
     if os.environ.has_key("EC2_URL"):
-        cred_list['ec2_url'] = os.environ["EC2_URL"]
+        cred_dict['ec2_url'] = os.environ["EC2_URL"]
         
-    return cred_list
+    return cred_dict
    
 
 def cloud_provider(url):
@@ -88,21 +88,23 @@ def cloud_provider(url):
     return "openstack"
 
 
-def connect_cloud(access_key, secret_key, url):
+def connect_cloud(cred_dict):
     '''
     This function uses ec2 API to connect to various cloud providers.
     Note that, it only connects to one cloud at a time.
 
-    @param access_key: The EC2 access key.
-    @param secret_key: The EC2 secret key.
-    @param url: The EC2 API endpoint of the cloud.
+    @type cred_dict: dictionary
+    @param cred_dict: A dictionary containing access, secret and 
+    connection urls.
 
     @return: NULL
 
     @todo: add support for other cloud providers
 
     '''
+    
     global conn
+    url = cred_dict['ec2_url']
     url_endpoint = url.split('/')[2]
     url_port = url.split(':')[2].split('/')[0]
     url_path = url.split(url_port)[1]
@@ -111,12 +113,12 @@ def connect_cloud(access_key, secret_key, url):
 
     if provider == "openstack":
         if url_protocol == "http":
-            conn = EC2Connection(access_key,
-                    secret_key,
+            conn = EC2Connection(cred_dict['ec2_access_key'],
+                    cred_dict['ec2_secret_key'],
                     region=region_var,
                     is_secure=False,
                     path=url_path)
-            return
+    return
 
 
 def gen_save_keypair():
@@ -311,5 +313,3 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
     for line in stdout:
         print line
     ssh.close()
-
-print get_credentials_config_file(get_credentials_env())
