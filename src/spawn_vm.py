@@ -6,6 +6,7 @@ from time import sleep
 import os
 import paramiko
 import socket
+import argparse
 
 region_var = EC2RegionInfo(name="siel.openstack", endpoint="10.2.4.129:8773")
 print region_var
@@ -23,6 +24,26 @@ master_instance_number = 1
 slaves_instance_flavor = "m1.tiny"
 slaves_instance_number = 1
 
+# The global dictionary where all the argument keywords will be stored.
+args_dict = dict()
+
+def get_cli_arguments():
+    '''
+    Parse the command line arguments.
+    '''
+    
+    parse = argparse.ArgumentParser(description="Run Hadoop on cloud")
+    parse.add_argument('-i', '--input', required=True, help="S3 URL of the input data")
+    parse.add_argument('-o', '--output', required=True, help="S3 URL of the output data")
+    parse.add_argument('-j', '--jar', required=True, help="location of the jar file")
+    parse.add_argument('-c', '--classpath', required=True, help="classpath")
+    args = parse.parse_args()
+    
+    args_dict['input'] = args.input
+    args_dict['output'] = args.output
+    args_dict['jar'] = args.jar
+    args_dict['classpath'] = args.classpath
+    
 
 def get_credentials_config_file(cred_dict):
     '''
