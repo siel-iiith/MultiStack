@@ -4,6 +4,7 @@ from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 from time import sleep
 import os
+import sys
 import paramiko
 import socket
 import argparse
@@ -24,6 +25,7 @@ slaves_instance_number = 1
 
 # The global dictionary where all the argument keywords will be stored.
 args_dict = dict()
+cred_dict = dict()
 
 def get_cli_arguments():
     '''
@@ -43,7 +45,7 @@ def get_cli_arguments():
     args_dict['classpath'] = args.classpath
     
 
-def get_credentials_config_file(cred_dict):
+def get_credentials_config_file():
     '''
     It fetches the EC2 credentials from hadoopstack's configuration file.
     default - ~/.hadoopstack/config
@@ -65,11 +67,11 @@ def get_credentials_config_file(cred_dict):
         option = parameter.split('=')[0]
         value = parameter.split('=')[1]
         if option == "EC2_ACCESS_KEY" or option == "ec2_access_key":
-            cred_dict['ec2_access_key'] = value
+            cred_dict['ec2_access_key'] = value.split('\n')[0]
         elif option == "EC2_SECRET_KEY" or option == "ec2_secret_key":
-            cred_dict['ec2_secret_key'] = value
+            cred_dict['ec2_secret_key'] = value.split('\n')[0]
         elif option == "EC2_URL" or option == "ec2_url":
-            cred_dict['ec2_url'] = value
+            cred_dict['ec2_url'] = value.split('\n')[0]
             
     return cred_dict
 
@@ -82,7 +84,6 @@ def get_credentials_env():
     @return: A dictionary of the fetched credentials.
     '''
     
-    cred_dict = dict()
     if os.environ.has_key("EC2_ACCESS_KEY"):
         cred_dict['ec2_access_key'] = os.environ["EC2_ACCESS_KEY"]
     
@@ -107,7 +108,7 @@ def cloud_provider(url):
     return "openstack"
 
 
-def connect_cloud(cred_dict):
+def connect_cloud():
     '''
     This function uses ec2 API to connect to various cloud providers.
     Note that, it only connects to one cloud at a time.
@@ -132,7 +133,6 @@ def connect_cloud(cred_dict):
     
     # A default region is required by boto for initiating connection.
     region_var = EC2RegionInfo(name="tmp.hadoopstack", endpoint=url_endpoint)
-    print region_var
 
     if provider == "openstack":
         if url_protocol == "http":
@@ -141,7 +141,7 @@ def connect_cloud(cred_dict):
                     region=region_var,
                     is_secure=False,
                     path=url_path)
-            print conn.get_all_images()
+            print conn
     return
 
 
@@ -250,7 +250,7 @@ def refresh(resv_obj):
             return res
 
 
-def estimate_run_instances(input_size, deadline):
+def estimate_run_instances():
     '''
     This function estimates the number and flavour of instances based on the
     input size and deadline of the project.
@@ -337,3 +337,13 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
     for line in stdout:
         print line
     ssh.close()
+    
+    
+if __name__ == "__main__":
+    get_credentials_env()
+    get_credentials_config_file()
+    connect_cloud()
+    gen_save_keypair()
+    create_sec_group()
+    estimate_run_instances()
+    
