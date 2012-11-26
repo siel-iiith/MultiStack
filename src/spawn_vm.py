@@ -11,12 +11,13 @@ import argparse
 
 
 # This a fixed image ID for our private cloud. Its ubuntu-12.04-amd64
-default_image_id = "ami-00000010"
+default_image_id = "ami-0000001a"
 # The default minimum value of the no. of VMs to boot
 default_min_vm = 1
 default_key_location = os.path.expanduser("~/.hadoopstack")
+default_properties_location = "/tmp/properties"
 
-script_hadoop_install = "https://raw.github.com/dharmeshkakadia/Hadoop-Scripts/master/hadoop_install.sh"
+script_hadoop_install = "https://github.com/shredder12/Hadoop-Scripts/raw/master/main.sh"
 
 master_instance_flavor = "m1.tiny"
 master_instance_number = 1
@@ -248,6 +249,40 @@ def refresh(resv_obj):
     for res in conn.get_all_instances():
         if res.id == resv_obj.id:
             return res
+        
+
+def create_properties(master_resv_obj, slaves_resv_obj, master_public_ip, namenode=True,):
+    '''
+    Create properties file to be fed to the hadoop_install script
+    
+    @type master_resv_obj: boto.ec2.instance.Reservation object
+    @param master_resv_obj: Master node reservation object
+    
+    @type slaves_resv_obj: boto.ec2.instance.Reservation object 
+    @param slaves_resv_obj: Slave nodes reservation object
+    
+    @type master_public_ip: string
+    @param master_public_ip: Public IP of master node
+    
+    '''
+    
+    properties_fd = open(default_properties_location, 'w+')
+    properties_fd.write("jobtracker\t" + master_public_ip + ":54311\t" + 
+                  master_resv_obj.instances[0].ip_address + '\n')
+    if namenode:
+        properties_fd.write("namenode\t" + master_public_ip + ":54310\t" + 
+                    master_resv_obj.instances[0].ip_address + '\n')
+    
+    while slaves_resv_obj.instances[-1].state != "running":
+        slaves_resv_obj = refresh(slaves_resv_obj)
+        sleep(1)
+    
+    for slave in slaves_resv_obj.instances:
+        properties_fd.write("slave\t" + slave.ip_address + '\n')
+        
+    properties_fd.close()
+    
+    return
 
 
 def estimate_run_instances():
@@ -284,6 +319,11 @@ def estimate_run_instances():
             ["hadoopstack"],
             slaves_instance_flavor)
     
+    create_properties(master_resv_obj, slaves_resv_obj,
+                       master_elastic_address.public_ip.encode('ascii',
+                                                               'ignore'),
+                      True)
+    
     configure_instances(master_resv_obj, slaves_resv_obj,
                         master_elastic_address.public_ip.encode('ascii',
                                                                 'ignore'),
@@ -292,21 +332,21 @@ def estimate_run_instances():
     return
 
 
-def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, script_location):
+def configure_instances(master_resv_obj, slaves_resv_obj, master_public_ip, script_location):
     '''
     This function accesses and executes the script, specified by 
     script_location, on master.
     
-    @type Reservation: boto.ec2.instance.Reservation object
+    @type master_resv_obj: boto.ec2.instance.Reservation object
     @param master_resv_obj: Master node reservation object
     
-    @type Reservation: boto.ec2.instance.Reservation object 
-    @param slave_resv_obj: Slave nodes reservation object
+    @type slaves_resv_obj: boto.ec2.instance.Reservation object 
+    @param slaves_resv_obj: Slave nodes reservation object
     
-    @type value: string
+    @type master_public_ip: string
     @param master_public_ip: Public IP of master node
     
-    @type value: string
+    @type script_location: string
     @param script_location: Location of the script to be executed on the master
 
     '''
@@ -314,6 +354,8 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     key_location = default_key_location + "/hadoopstack.pem"
+    script_name = script_location.split('/')[-1]
+    
     while(True):
         try:
             ssh.connect(hostname=master_public_ip,
@@ -331,9 +373,18 @@ def configure_instances(master_resv_obj, slave_resv_obj, master_public_ip, scrip
 
     sftp = ssh.open_sftp()
     sftp.put(key_location, "/root/hadoopstack.pem")
+    sftp.put(default_properties_location, "/root/properties")
     sftp.close()
+
+    stdin, stdout, stderr = ssh.exec_command("wget " + script_location)
+    for line in stderr:
+        print line
+                                              
+    ssh.exec_command("chmod a+x " + script_name)
     
-    stdin, stdout, stderr = ssh.exec_command('ls')
+    stdin, stdout, stderr = ssh.exec_command('./' + script_name + 
+                                             ' /root/hadoopstack.pem' + 
+                                             ' /root/properties')
     for line in stdout:
         print line
     ssh.close()
