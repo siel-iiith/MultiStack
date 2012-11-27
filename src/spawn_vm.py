@@ -19,9 +19,9 @@ default_properties_location = "/tmp/properties"
 
 script_hadoop_install = "https://github.com/shredder12/Hadoop-Scripts/raw/master/main.sh"
 
-master_instance_flavor = "m1.tiny"
+master_instance_flavor = "m1.medium"
 master_instance_number = 1
-slaves_instance_flavor = "m1.tiny"
+slaves_instance_flavor = "m1.medium"
 slaves_instance_number = 1
 
 # The global dictionary where all the argument keywords will be stored.
@@ -251,7 +251,7 @@ def refresh(resv_obj):
             return res
         
 
-def create_properties(master_resv_obj, slaves_resv_obj, master_public_ip, namenode=True,):
+def create_properties(master_resv_obj, slaves_resv_obj, master_public_ip, namenode=True):
     '''
     Create properties file to be fed to the hadoop_install script
     
@@ -267,11 +267,15 @@ def create_properties(master_resv_obj, slaves_resv_obj, master_public_ip, nameno
     '''
     
     properties_fd = open(default_properties_location, 'w+')
-    properties_fd.write("jobtracker\t" + master_public_ip + ":54311\t" + 
-                  master_resv_obj.instances[0].ip_address + '\n')
+    properties_fd.write("jobtracker\t" + 
+                        master_resv_obj.instances[0].ip_address + 
+                        ":54311" + 
+                         '\n')
     if namenode:
-        properties_fd.write("namenode\t" + master_public_ip + ":54310\t" + 
-                    master_resv_obj.instances[0].ip_address + '\n')
+        properties_fd.write("namenode\t" + 
+                            master_resv_obj.instances[0].ip_address + 
+                            ":54310" + 
+                            '\n')
     
     while slaves_resv_obj.instances[-1].state != "running":
         slaves_resv_obj = refresh(slaves_resv_obj)
