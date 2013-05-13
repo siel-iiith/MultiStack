@@ -1,3 +1,6 @@
+import os
+del os.environ['http_proxy']
+
 import requests
 import json
 url = "http://localhost:5000/"

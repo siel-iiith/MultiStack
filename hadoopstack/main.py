@@ -1,3 +1,4 @@
+import os
 from flask import Flask , request , Response
 from .api.v1 import app_v1
 from urlparse import urlparse, parse_qs
@@ -6,6 +7,9 @@ app.register_blueprint(app_v1)
 import requests
 import simplejson
 from flask import jsonify
+del os.environ['http_proxy']
+
+
  
 @app.route('/',methods=['GET', 'POST'])
 def default():
