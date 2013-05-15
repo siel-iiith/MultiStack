@@ -14,14 +14,10 @@ app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
 ################custom modules to import
 
 from connections import make_connection
+from spawn import spawn_instances
 
 
 
-
-
-
-def spawn_instances(image_id, number, keypair, sec_group, flavor):
-	return conn.run_instances(default_image_id,int(default_min_vm),int(number),keypair,sec_group,flavor)
 
 
 
@@ -37,7 +33,8 @@ def version():
 		number_of_vms=int(data['cluster']['node-recipes']['tasktracker'])+int(data['cluster']['node-recipes']['jobtracker'])
 		output = open("foo.txt", "a")
 		output.write(str(data['cluster']))
-		make_connection()
+		conn=make_connection()
+		spawn_instances(conn,number_of_vms)
 		output.write("number_of_vms"+str(number_of_vms))
 		
 			

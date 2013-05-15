@@ -1,0 +1,69 @@
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 41, in version
+    spawn_instances()
+TypeError: spawn_instances() takes exactly 5 arguments (0 given)
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 41, in version
+    spawn_instances()
+TypeError: spawn_instances() takes exactly 5 arguments (0 given)
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 41, in version
+    spawn_instances()
+TypeError: spawn_instances() takes exactly 5 arguments (0 given)
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 37, in version
+    spawn_instances()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/spawn.py", line 8, in spawn_instances
+    return conn.run_instances(default_image_id,int(default_min_vm),int(number),flavor)
+NameError: global name 'conn' is not defined
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 36, in version
+    spawn_instances()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/spawn.py", line 8, in spawn_instances
+    return conn.run_instances(default_image_id,int(default_min_vm),int(number),flavor)
+NameError: global name 'conn' is not defined
