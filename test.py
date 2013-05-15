@@ -12,3 +12,8 @@ print data_string
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 r = requests.post(url, data=json.dumps(data), headers=headers)
 print r.text
+
+
+########curl script for the same
+#curl --dump-header  -v -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "{\"uid\":12,\"token\":\"asdert\"}" http://localhost:5000/v1/
+
