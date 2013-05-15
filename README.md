@@ -14,4 +14,4 @@ $ python hs.py
 $ pip install -r addition
 
 
-#two files added for testing and hitting the server curlTest.sh and test.py
+#two files added for testing and hitting the server curlTest.sh and test.py in folder Tests
