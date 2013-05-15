@@ -1,3 +1,4 @@
+ 
 Exception on /v1/ [POST]
 Traceback (most recent call last):
   File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
@@ -8,8 +9,34 @@ Traceback (most recent call last):
     rv = self.dispatch_request()
   File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
     return self.view_functions[rule.endpoint](**req.view_args)
-  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 15, in version
-    data=request.raw_post_data
-  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/werkzeug/local.py", line 336, in __getattr__
-    return getattr(self._get_current_object(), name)
-AttributeError: 'Request' object has no attribute 'raw_post_data'
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 16, in version
+    output = open("foo.txt", a)
+NameError: global name 'a' is not defined
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 17, in version
+    output.write(data)
+TypeError: expected a character buffer object
+Exception on /v1/ [POST]
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/local/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 51, in version
+    make_connection()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/connections.py", line 6, in make_connection
+    hs_region = EC2RegionInfo(name="anythin", endpoint='10.2.4.129:8773')
+NameError: global name 'EC2RegionInfo' is not defined
