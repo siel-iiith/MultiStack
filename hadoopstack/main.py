@@ -14,6 +14,7 @@ del os.environ['http_proxy']
 @app.route('/',methods=['GET', 'POST'])
 def default():
 	if request.method == 'POST':
+		
 		return jsonify(**request.json)
 
 		#return "hello"	       	
@@ -28,5 +29,14 @@ def default():
 
 
 if __name__ == '__main__':
-    app.debug = True
+#    app.debug = True
     app.run(host='0.0.0.0')
+
+
+
+if not app.debug:
+    import logging
+    from logging import FileHandler
+    file_handler = FileHandler("error.txt")
+    file_handler.setLevel(logging.WARNING)
+    app.logger.addHandler(file_handler)
