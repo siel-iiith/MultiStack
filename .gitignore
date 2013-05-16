@@ -34,3 +34,4 @@ venv
 .mr.developer.cfg
 .project
 .pydevproject
+hadoopstack/services/config.py
