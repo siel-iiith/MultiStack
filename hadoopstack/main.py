@@ -5,7 +5,7 @@ from hadoopstack.api.v1 import app_v1
 app = Flask(__name__)
 app.register_blueprint(app_v1)
 
-@app.route('/',methods=['GET', 'POST'])
+@app.route('/')
 def default():
     return "Current API is v1 accessible on url prefix /v1"
 
