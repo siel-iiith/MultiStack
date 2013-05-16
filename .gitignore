@@ -29,7 +29,7 @@ nosetests.xml
 
 # Translations
 *.mo
-
+venv
 # Mr Developer
 .mr.developer.cfg
 .project
