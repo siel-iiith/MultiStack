@@ -1,0 +1,177 @@
+{"cluster": {"node-recipes": {"tasktracker": 3, "jobtracker": 1}, "name": "test", "image-id": "ubuntu-12.04-amd64.img"}}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>EC2ResponseError: EC2ResponseError: 404 Not Found
+None // Werkzeug Debugger</title>
+    <link rel="stylesheet" href="?__debugger__=yes&amp;cmd=resource&amp;f=style.css" type="text/css">
+    <script type="text/javascript" src="?__debugger__=yes&amp;cmd=resource&amp;f=jquery.js"></script>
+    <script type="text/javascript" src="?__debugger__=yes&amp;cmd=resource&amp;f=debugger.js"></script>
+    <script type="text/javascript">
+      var TRACEBACK = 39680336,
+          CONSOLE_MODE = false,
+          EVALEX = true,
+          SECRET = "ijdBJl3gQFFSneLVAtHq";
+    </script>
+  </head>
+  <body>
+    <div class="debugger">
+<h1>boto.exception.EC2ResponseError</h1>
+<div class="detail">
+  <p class="errormsg">EC2ResponseError: EC2ResponseError: 404 Not Found
+None</p>
+</div>
+<h2 class="traceback">Traceback <em>(most recent call last)</em></h2>
+<div class="traceback">
+  
+  <ul><li><div class="frame" id="frame-39679696">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1701</em>,
+      in <code class="function">__call__</code></h4>
+  <pre>return self.wsgi_app(environ, start_response)</pre>
+</div>
+
+<li><div class="frame" id="frame-39680400">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1689</em>,
+      in <code class="function">wsgi_app</code></h4>
+  <pre>response = self.make_response(self.handle_exception(e))</pre>
+</div>
+
+<li><div class="frame" id="frame-39764560">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1687</em>,
+      in <code class="function">wsgi_app</code></h4>
+  <pre>response = self.full_dispatch_request()</pre>
+</div>
+
+<li><div class="frame" id="frame-39764496">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1360</em>,
+      in <code class="function">full_dispatch_request</code></h4>
+  <pre>rv = self.handle_user_exception(e)</pre>
+</div>
+
+<li><div class="frame" id="frame-39764624">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1358</em>,
+      in <code class="function">full_dispatch_request</code></h4>
+  <pre>rv = self.dispatch_request()</pre>
+</div>
+
+<li><div class="frame" id="frame-39764688">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py"</cite>,
+      line <em class="line">1344</em>,
+      in <code class="function">dispatch_request</code></h4>
+  <pre>return self.view_functions[rule.endpoint](**req.view_args)</pre>
+</div>
+
+<li><div class="frame" id="frame-39764752">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py"</cite>,
+      line <em class="line">21</em>,
+      in <code class="function">clusters</code></h4>
+  <pre>spawn_instances(conn,num_vms)</pre>
+</div>
+
+<li><div class="frame" id="frame-39764816">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/services/cluster.py"</cite>,
+      line <em class="line">27</em>,
+      in <code class="function">spawn_instances</code></h4>
+  <pre>conn.run_instances(image_id, int(number), int(number), None, None, flavor)</pre>
+</div>
+
+<li><div class="frame" id="frame-39764880">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/ec2/connection.py"</cite>,
+      line <em class="line">720</em>,
+      in <code class="function">run_instances</code></h4>
+  <pre>verb='POST')</pre>
+</div>
+
+<li><div class="frame" id="frame-39765008">
+  <h4>File <cite class="filename">"/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/connection.py"</cite>,
+      line <em class="line">1069</em>,
+      in <code class="function">get_object</code></h4>
+  <pre>raise self.ResponseError(response.status, response.reason, body)</pre>
+</div>
+</ul>
+  <blockquote>EC2ResponseError: EC2ResponseError: 404 Not Found
+None</blockquote>
+</div>
+
+<div class="plain">
+  <form action="http://paste.pocoo.org/" method="post">
+    <p>
+      <input type="hidden" name="language" value="pytb">
+      This is the Copy/Paste friendly version of the traceback.  <span
+      class="pastemessage">You can also paste this traceback into LodgeIt:
+      <input type="submit" value="create paste"></span>
+    </p>
+    <textarea cols="50" rows="10" name="code" readonly>Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1701, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1689, in wsgi_app
+    response = self.make_response(self.handle_exception(e))
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 21, in clusters
+    spawn_instances(conn,num_vms)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/services/cluster.py", line 27, in spawn_instances
+    conn.run_instances(image_id, int(number), int(number), None, None, flavor)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/ec2/connection.py", line 720, in run_instances
+    verb='POST')
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/connection.py", line 1069, in get_object
+    raise self.ResponseError(response.status, response.reason, body)
+EC2ResponseError: EC2ResponseError: 404 Not Found
+None</textarea>
+  </form>
+</div>
+<div class="explanation">
+  The debugger caught an exception in your WSGI application.  You can now
+  look at the traceback which led to the error.  <span class="nojavascript">
+  If you enable JavaScript you can also use additional features such as code
+  execution (if the evalex feature is enabled), automatic pasting of the
+  exceptions and much more.</span>
+</div>
+      <div class="footer">
+        Brought to you by <strong class="arthur">DON'T PANIC</strong>, your
+        friendly Werkzeug powered traceback interpreter.
+      </div>
+    </div>
+  </body>
+</html>
+
+<!--
+
+Traceback (most recent call last):
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1701, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1689, in wsgi_app
+    response = self.make_response(self.handle_exception(e))
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1687, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1360, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1358, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/flask/app.py", line 1344, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/api/v1.py", line 21, in clusters
+    spawn_instances(conn,num_vms)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/hadoopstack/services/cluster.py", line 27, in spawn_instances
+    conn.run_instances(image_id, int(number), int(number), None, None, flavor)
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/ec2/connection.py", line 720, in run_instances
+    verb='POST')
+  File "/home/hellboy2k8/Documents/siel/HadoopStack/venv/lib/python2.7/site-packages/boto/connection.py", line 1069, in get_object
+    raise self.ResponseError(response.status, response.reason, body)
+EC2ResponseError: EC2ResponseError: 404 Not Found
+None
+
+-->
+
