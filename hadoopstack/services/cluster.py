@@ -1,8 +1,10 @@
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
-#from hadoopstack.services import config
+
+# import hadoopstack.services.config wont work here as this would require all variables to be addressed as hadoopstack.services.config.ec2_url for example
+from hadoopstack.services import config
 #from hadoopstack.services.config import *
-import config
+#import config
 
 def make_connection():
         url = config.ec2_url
