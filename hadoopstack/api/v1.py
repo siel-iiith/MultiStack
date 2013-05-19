@@ -30,13 +30,19 @@ def clusters():
 	foo.flush() 
 	foo.write(str(type(data)))
 	foo.write(str(data))
-
+	
 	#j = { "name" : "mongo" }
-	#mongo.db.things.insert( j )
+	
         conn=make_connection()
         spawn_instances(conn,num_vms)
         allVMDetails=getVMid(conn)
+	foo.write("yada yada yada")
+	foo.write(str([i[0] for i in allVMDetails]))
+	foo.write("yada yada yada")
+	foo.flush() 
 	clusterDetails=fetchDict(conn,allVMDetails)
+	
+	mongo.db.cluster.insert(clusterDetails)
 #	clusterDetails['VMids']=[i[0] for i in allVMDetails]
 #	clusterDetails['user']="penguinRaider" ############hardcoded for now will pull later after getting details	
 #	clusterDetails['userId']=[i.owner_id for i in conn.get_all_instances() ] ############not sure if this is to be implemented or the user so putting both for now
