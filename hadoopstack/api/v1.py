@@ -4,12 +4,14 @@ from hadoopstack.services.cluster import make_connection
 from hadoopstack.services.cluster import spawn_instances
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
+import simplejson
+
 app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
 #from hadoopstack.main import mongo
 #app_v1.config.from_object('config')
 mongo = PyMongo()
 clusterDetails={}
-
+import json
 
 @app_v1.route('/')
 def version():
@@ -50,9 +52,12 @@ def clusters():
 #	clusterDetails['created_at']=[i[1] for i in allVMDetails]
 #	clusterDetails['updated_at']="NA"
 #	clusterDetails['status']=[i[2] for i in allVMDetails]
-
+	id_t=str(clusterDetails['_id'])
+	foo.write("sTr"+str(simplejson.dumps(id_t))+"sTr")
+	clusterDetails['_id']=simplejson.dumps(id_t)	
 	foo.write(str(clusterDetails))    
 	foo.close()
+	return jsonify(**clusterDetails)
         #return jsonify(**request.json)    
         
     return app_v1.name
