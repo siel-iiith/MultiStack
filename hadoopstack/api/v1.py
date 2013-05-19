@@ -11,6 +11,7 @@ app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
 #app_v1.config.from_object('config')
 mongo = PyMongo()
 clusterDetails={}
+POSTout={}
 import json
 
 @app_v1.route('/')
@@ -55,9 +56,10 @@ def clusters():
 	id_t=str(clusterDetails['_id'])
 	foo.write("sTr"+str(simplejson.dumps(id_t))+"sTr")
 	clusterDetails['_id']=simplejson.dumps(id_t)	
+	POSTout['CID']=id_t
 	foo.write(str(clusterDetails))    
 	foo.close()
-	return jsonify(**clusterDetails)
+	return jsonify(**POSTout)
         #return jsonify(**request.json)    
         
     return app_v1.name
