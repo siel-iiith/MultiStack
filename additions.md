@@ -3,3 +3,6 @@ requests #to make simple json calls for testing
 flask-sqlalchemy==0.7.9
 Flask-PyMongo
 boto
+mongoengine
+flask_mongoengine
+
