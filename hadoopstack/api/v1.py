@@ -14,13 +14,58 @@ clusterDetails={}
 POSTout={}
 import json
 
-@app_v1.route('/')
+@app_v1.route('/',methods = ['GET','POST'])
 def version():
+    '''
+	GET request of the cluster API
+    '''
+    if request.method == 'POST':
+ 		cursor=mongo.db.cluster.find()
+    		foo = open("foo.txt", "a")
+		foo.write("hello there ")
+    		foo.flush() 
+    		foo.write(str(type(cursor)))
+    		foo.write(str(cursor))
+		foo.write(str(cursor.__dict__))
+		allEle=[]
+		
+		for obj in mongo.db.cluster.find(): allEle.append(obj)
+		
+		objToReturn={}
+		objToReturn['cluster']=allEle;
+		foo.write(str(objToReturn))
+		xxx=allTuples=[(objToReturn[i]) for i in objToReturn]
+		yyy=xxx[0][0]['_id']
+		allIds=[  (str(ids['_id'])) for i in allTuples for ids in i]
+		for i in xrange(0,len(allIds)):
+			allTuples[i][0]['_id']=allIds[i]
+		#[ allTuples[i][0]['_id']=allIds[i]		for i in xrange(0,len(allIds))]
+
+		#objToReturn['cluster']=map(lambda x,y:    ,allTuples,allIds)
+		
+		foo.write("ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsd")
+		foo.write(str(xxx))
+		foo.write("done done done done")
+		foo.write(str(yyy))
+		foo.write("next to print")
+		foo.write(str(allIds))
+		foo.write("hence the list")
+		foo.write(str(objToReturn))
+		#for i in objToReturn:
+		#	 for  in i:
+		#		foo.write(i)
+		return jsonify(**objToReturn)
+
+
     return "v1 API. Jobs and clusters API are accessible at /jobs and \
     /clusters respectively"
 
 @app_v1.route('/clusters/', methods = ['GET','POST'])
 def clusters():
+    '''
+	PUT request of cluster API
+
+    '''
     if request.method == 'POST':
         data = request.json
 	#mongo.db.cluster.insert(data)
