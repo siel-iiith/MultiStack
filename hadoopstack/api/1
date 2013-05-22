@@ -33,32 +33,23 @@ def version():
 		
 		objToReturn={}
 		objToReturn['cluster']=allEle;
-		foo.write("objetoReturn\n\n")
 		foo.write(str(objToReturn))
-		foo.write("\n\n\n");
 		xxx=allTuples=[(objToReturn[i]) for i in objToReturn]
-		#yyy=xxx[0][0]['_id']
+		yyy=xxx[0][0]['_id']
 		allIds=[  (str(ids['_id'])) for i in allTuples for ids in i]
-		foo.write("allid\n")
 		foo.write(str(allIds))
-		foo.write("\n\n\n\n")
-		foo.write("allTuples\n")
-		foo.write(str(allTuples))
-		foo.write("\n\n\n\n")
-	 	#foo.write(str(allTuples[0][1]))
-		
-		foo.flush() 	
-			
+
+
 		for i in xrange(0,len(allIds)):
-			allTuples[0][i]['_id']=allIds[i]
+			allTuples[i][0]['_id']=allIds[i]
 		#[ allTuples[i][0]['_id']=allIds[i]		for i in xrange(0,len(allIds))]
 
 		#objToReturn['cluster']=map(lambda x,y:    ,allTuples,allIds)
 		
 		foo.write("ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsd")
-		#foo.write(str(xxx))
+		foo.write(str(xxx))
 		foo.write("done done done done")
-		#foo.write(str(yyy))
+		foo.write(str(yyy))
 		foo.write("next to print")
 		foo.write(str(allIds))
 		foo.write("hence the list")
