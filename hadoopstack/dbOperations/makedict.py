@@ -5,7 +5,7 @@ def fetchDict(conn,allVMDetails,recipeList):
 	VMIdList=[]
 	#for i in xrange(0,len(allVMDetails)):
 	#VMMap=map(lambda x,y :(x,y),[i[0] for i in allVMDetails],recipeList)
-	VMIdList=[{"id":i[0],"role":i[1]} for i in map(lambda x,y :(x,y),[i[0] for i in allVMDetails],recipeList) ]
+	VMIdList=[{'id':i[0],'role':i[1]} for i in map(lambda x,y :(x,y),[i[0] for i in allVMDetails],recipeList) ]
 	#clusterDetails['VMids']=simplejson.dumps([i[0] for i in allVMDetails])
 	clusterDetails['VMids']=simplejson.dumps(VMIdList)
 	

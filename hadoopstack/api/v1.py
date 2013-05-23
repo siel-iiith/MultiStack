@@ -4,6 +4,7 @@ from hadoopstack.services.cluster import make_connection
 from hadoopstack.services.cluster import spawn_instances
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
+from hadoopstack.services.associateIP import associatePublicIp
 import simplejson
 
 app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
@@ -48,7 +49,7 @@ def version():
 	 	#foo.write(str(allTuples[0][1]))
 		
 		foo.flush() 	
-			
+	
 		for i in xrange(0,len(allIds)):
 			allTuples[0][i]['_id']=allIds[i]
 		#[ allTuples[i][0]['_id']=allIds[i]		for i in xrange(0,len(allIds))]
@@ -100,8 +101,9 @@ def clusters():
 	#j = { "name" : "mongo" }
 	
         conn=make_connection()
-        spawn_instances(conn,num_vms)
-        allVMDetails=getVMid(conn)
+        reservationId=spawn_instances(conn,num_vms)
+	reserveId=reservationId.id
+        allVMDetails=getVMid(conn,reserveId)
 	foo.write("yada yada yada")
 	foo.write(str([i[0] for i in allVMDetails]))
 	foo.write("yada yada yada")
@@ -116,6 +118,8 @@ def clusters():
 #	clusterDetails['created_at']=[i[1] for i in allVMDetails]
 #	clusterDetails['updated_at']="NA"
 #	clusterDetails['status']=[i[2] for i in allVMDetails]
+	associatePublicIp(conn,reserveId)
+		
 	id_t=str(clusterDetails['_id'])
 	foo.write("sTr"+str(simplejson.dumps(id_t))+"sTr")
 	clusterDetails['_id']=simplejson.dumps(id_t)	
