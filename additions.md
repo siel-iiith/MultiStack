@@ -5,4 +5,4 @@ Flask-PyMongo
 boto
 mongoengine
 flask_mongoengine
-
+fabric
