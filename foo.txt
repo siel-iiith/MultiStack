@@ -214,4 +214,124 @@ allTuples
 
 
 
-ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print['519d87d8a7b2d661834ed6af', '519d87dba7b2d661834ed6b0', '519d87e0a7b2d661834ed6b1']hence the list{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:20.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-00000538"}]', u'user': u'penguinRaider', u'_id': '519d87d8a7b2d661834ed6af', u'stack': u'hadoop'}, {u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:24.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-00000539"}]', u'user': u'penguinRaider', u'_id': '519d87dba7b2d661834ed6b0', u'stack': u'hadoop'}, {u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:28.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053a"}]', u'user': u'penguinRaider', u'_id': '519d87e0a7b2d661834ed6b1', u'stack': u'hadoop'}]}
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print['519d87d8a7b2d661834ed6af', '519d87dba7b2d661834ed6b0', '519d87e0a7b2d661834ed6b1']hence the list{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:20.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-00000538"}]', u'user': u'penguinRaider', u'_id': '519d87d8a7b2d661834ed6af', u'stack': u'hadoop'}, {u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:24.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-00000539"}]', u'user': u'penguinRaider', u'_id': '519d87dba7b2d661834ed6b0', u'stack': u'hadoop'}, {u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:07:28.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053a"}]', u'user': u'penguinRaider', u'_id': '519d87e0a7b2d661834ed6b1', u'stack': u'hadoop'}]}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x1abcc90>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': []}
+
+
+allid
+[]
+
+
+
+allTuples
+[[]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print[]hence the list{'cluster': []}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-0000053b']yada yada yadahello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x179fbd0>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]}
+
+
+allid
+['519d8e65a7b2d664084daf27']
+
+
+
+allTuples
+[[{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print['519d8e65a7b2d664084daf27']hence the list{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': '519d8e65a7b2d664084daf27', u'stack': u'hadoop'}]}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x179fb90>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]}
+
+
+allid
+['519d8e65a7b2d664084daf27']
+
+
+
+allTuples
+[[{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print['519d8e65a7b2d664084daf27']hence the list{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': '519d8e65a7b2d664084daf27', u'stack': u'hadoop'}]}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x179fc10>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]}
+
+
+allid
+['519d8e65a7b2d664084daf27']
+
+
+
+allTuples
+[[{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': ObjectId('519d8e65a7b2d664084daf27'), u'stack': u'hadoop'}]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print['519d8e65a7b2d664084daf27']hence the list{'cluster': [{u'status': u'["pending"]', u'created_at': u'["2013-05-23T03:35:18.000Z"]', u'userId': u'["61cc05ad3b3343cd9c2bd6243a834449"]', u'updated_at': u'NA', u'VMids': u'[{"role": "jobtracker", "id": "Instance:i-0000053b"}]', u'user': u'penguinRaider', u'_id': '519d8e65a7b2d664084daf27', u'stack': u'hadoop'}]}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x179f990>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': []}
+
+
+allid
+[]
+
+
+
+allTuples
+[[]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print[]hence the list{'cluster': []}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-0000053c']yada yada yadasTr"519d8e88a7b2d66422bde45a"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T03:35:52.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-0000053c"}]', 'user': 'penguinRaider', '_id': '"519d8e88a7b2d66422bde45a"', 'stack': 'hadoop'}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x23bcbd0>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': []}
+
+
+allid
+[]
+
+
+
+allTuples
+[[]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print[]hence the list{'cluster': []}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-0000053d']yada yada yadasTr"519d8f1fa7b2d6646084a6dd"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T03:38:23.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-0000053d"}]', 'user': 'penguinRaider', '_id': '"519d8f1fa7b2d6646084a6dd"', 'stack': 'hadoop'}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x1d03bd0>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': []}
+
+
+allid
+[]
+
+
+
+allTuples
+[[]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print[]hence the list{'cluster': []}hello there <class 'pymongo.cursor.Cursor'><pymongo.cursor.Cursor object at 0x1d03b90>{'_Cursor__batch_size': 0, '_Cursor__query_flags': 0, '_Cursor__read_preference': 0, '_Cursor__must_use_master': False, '_Cursor__retrieved': 0, '_Cursor__limit': 0, '_Cursor__data': deque([]), '_Cursor__fields': None, '_Cursor__max_scan': None, '_Cursor__secondary_acceptable_latency_ms': 15.0, '_Cursor__as_class': <type 'dict'>, '_Cursor__kwargs': {}, '_Cursor__slave_okay': False, '_Cursor__ordering': None, '_Cursor__id': None, '_Cursor__partial': False, '_Cursor__await_data': False, '_Cursor__explain': False, '_Cursor__hint': None, '_Cursor__tz_aware': True, '_Cursor__collection': Collection(Database(MongoClient('localhost', 27017), u'clusterDB'), u'cluster'), '_Cursor__manipulate': True, '_Cursor__snapshot': False, '_Cursor__connection_id': None, '_Cursor__tailable': False, '_Cursor__killed': False, '_Cursor__skip': 0, '_Cursor__uuid_subtype': 3, '_Cursor__spec': {}, '_Cursor__timeout': True, '_Cursor__tag_sets': [{}], '_Cursor__empty': False}objetoReturn
+
+{'cluster': []}
+
+
+allid
+[]
+
+
+
+allTuples
+[[]]
+
+
+
+ahdjhjshjhjfsdhjfsfsdhksd shjhfjghsdjgsdfjgsjfghsfghfdghgsdhgsdhgsdfhgfsdghfsddone done done donenext to print[]hence the list{'cluster': []}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-0000053e']yada yada yadasTr"519d9977a7b2d6688ddf0c70"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T04:22:32.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-0000053e"}]', 'user': 'penguinRaider', '_id': '"519d9977a7b2d6688ddf0c70"', 'stack': 'hadoop'}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-0000053f']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000540']yada yada yadasTr"519d9ad9a7b2d668f5bf6db2"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T04:28:26.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000540"}]', 'user': 'penguinRaider', '_id': '"519d9ad9a7b2d668f5bf6db2"', 'stack': 'hadoop'}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000541']yada yada yadasTr"519d9b1ca7b2d6691557df38"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T04:29:32.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000541"}]', 'user': 'penguinRaider', '_id': '"519d9b1ca7b2d6691557df38"', 'stack': 'hadoop'}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000542']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000543']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000544']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000545']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000547']yada yada yadahello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000548']yada yada yadasTr"519da01da7b2d66a725a8014"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T04:50:54.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000548"}]', 'user': 'penguinRaider', '_id': '"519da01da7b2d66a725a8014"', 'stack': 'hadoop'}hello there <type 'dict'>{'cluster': {'node-recipes': {'tasktracker': 0, 'jobtracker': 1}, 'name': 'test', 'image-id': 'ubuntu-12.04-amd64.img'}}yada yada yada['Instance:i-00000549']yada yada yadasTr"519da052a7b2d66a725a8015"sTr{'status': '["pending"]', 'created_at': '["2013-05-23T04:51:47.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000549"}]', 'user': 'penguinRaider', '_id': '"519da052a7b2d66a725a8015"', 'stack': 'hadoop'}
