@@ -10,8 +10,11 @@ Usage
 
 $ python hs.py
 
+Dependencies
+============
 
-$ pip install -r additions.md
-
-
-#two files added for testing and hitting the server curlTest.sh and test.py in folder Tests
+$ pip install flask
+$ pip install flask-sqlalchemy
+$ pip install flask-pymongo
+$ pip install boto
+$ apt-get install mongodb
