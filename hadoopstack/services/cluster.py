@@ -25,7 +25,7 @@ def make_connection():
 def spawn_instances(conn, number, 
                     image_id = config.default_image_id, 
                     flavor = config.master_instance_flavor):
-    conn.run_instances(image_id, int(number), int(number),keyName, None, flavor)
+    conn.run_instances(image_id, int(number), int(number),config.keyName, None, flavor)
 
 
 #def spawn_instances(conn, number, 

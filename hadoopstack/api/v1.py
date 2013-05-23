@@ -81,8 +81,14 @@ def clusters():
     if request.method == 'POST':
         data = request.json
 	#mongo.db.cluster.insert(data)
-        num_tt = int(data['cluster']['node-recipes']['tasktracker'])
-        num_jt = int(data['cluster']['node-recipes']['jobtracker'])        
+        recipeList=[]
+	num_tt = int(data['cluster']['node-recipes']['tasktracker'])
+        num_jt = int(data['cluster']['node-recipes']['jobtracker'])       
+	[  recipeList.append("jobtracker")   for i in xrange(0,num_jt)]
+	[  recipeList.append("tasktracker")   for i in xrange(0,num_tt)]
+	
+
+ 
         num_vms = num_jt + num_tt
 	foo = open("foo.txt", "a")
 	#print "Name of the file: ", foo.name
@@ -100,7 +106,7 @@ def clusters():
 	foo.write(str([i[0] for i in allVMDetails]))
 	foo.write("yada yada yada")
 	foo.flush() 
-	clusterDetails=fetchDict(conn,allVMDetails)
+	clusterDetails=fetchDict(conn,allVMDetails,recipeList)
 	
 	mongo.db.cluster.insert(clusterDetails)
 #	clusterDetails['VMids']=[i[0] for i in allVMDetails]
