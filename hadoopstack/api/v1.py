@@ -108,7 +108,7 @@ def clusters():
 	foo.write(str([i[0] for i in allVMDetails]))
 	foo.write("yada yada yada")
 	foo.flush() 
-	clusterDetails=fetchDict(conn,allVMDetails,recipeList)
+	clusterDetails=fetchDict(conn,allVMDetails,recipeList,reserveId)
 	
 	mongo.db.cluster.insert(clusterDetails)
 #	clusterDetails['VMids']=[i[0] for i in allVMDetails]

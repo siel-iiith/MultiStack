@@ -1,6 +1,6 @@
 import simplejson
 
-def fetchDict(conn,allVMDetails,recipeList):
+def fetchDict(conn,allVMDetails,recipeList,reserveId):
 	clusterDetails={}
 	VMIdList=[]
 	#for i in xrange(0,len(allVMDetails)):
@@ -12,7 +12,7 @@ def fetchDict(conn,allVMDetails,recipeList):
 
 
 	clusterDetails['user']="penguinRaider" ############hardcoded for now will pull later after getting details      
-	clusterDetails['userId']=simplejson.dumps([i.owner_id for i in conn.get_all_instances() ]) ############not sure if this is to be implemented or the user so putting both for now
+	clusterDetails['userId']=simplejson.dumps([i.owner_id for i in conn.get_all_instances() if i.id==reserveId ]) ############not sure if this is to be implemented or the user so putting both for now
 	clusterDetails['stack']="hadoop"       ############as per blueprint
 	clusterDetails['created_at']=simplejson.dumps([i[1] for i in allVMDetails])
 	clusterDetails['updated_at']="NA"
