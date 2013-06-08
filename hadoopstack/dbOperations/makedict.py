@@ -1,6 +1,12 @@
 import simplejson
-
+import os
 def fetchDict(conn,allVMDetails,recipeList,reserveId):
+	foo=open("foo.txt","a+")
+	foo.write("came here \n")
+	foo.flush()
+#	proxy=os.environ['http_proxy']
+#	del   os.environ['http_proxy']
+
 	clusterDetails={}
 	VMIdList=[]
 	#for i in xrange(0,len(allVMDetails)):
@@ -17,5 +23,7 @@ def fetchDict(conn,allVMDetails,recipeList,reserveId):
 	clusterDetails['created_at']=simplejson.dumps([i[1] for i in allVMDetails])
 	clusterDetails['updated_at']="NA"
 	clusterDetails['status']=simplejson.dumps([i[2] for i in allVMDetails])
+#	os.environ['http_proxy']=proxy
+
 	return clusterDetails
 

@@ -17,7 +17,7 @@ else:
 
 urlx = "http://localhost:8000/measure"
 #data = {'sender': 'Alice', 'receiver': 'Bob', 'message': 'We did it!'}
-data={'cluster':{'name':'test','node-recipes':{"jobtracker":1,"tasktracker":0},'image-id': 'ubuntu-12.04-amd64.img'}}
+data={'cluster':{'name':'test','node-recipes':{"jobtracker":1,"tasktracker":1},'image-id': 'ubuntu-12.04-amd64.img'}}
 data_string = json.dumps(data)
 print data_string
 

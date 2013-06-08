@@ -5,8 +5,14 @@ from boto.ec2.regioninfo import EC2RegionInfo
 from hadoopstack.services import config
 #from hadoopstack.services.config import *
 #import config
-
+import os
 def make_connection():
+	#proxy=os.environ.get('http_proxy')
+	foo=open("foo.txt","a+")
+#foo.write("env variable should be here "+proxy)
+	foo.flush()
+	#del os.environ['http_proxy']
+	
         url = config.ec2_url
         url_endpoint = url.split('/')[2]
         url_port = url.split(':')[2].split('/')[0]
@@ -17,7 +23,10 @@ def make_connection():
         hs_region = EC2RegionInfo(name = "siel", endpoint = url_endpoint)
  	       
         conn=EC2Connection(aws_access_key_id=config.access_key,aws_secret_access_key=config.secret_key,is_secure=False,path=url_path,region=hs_region)
-        return conn
+	#os.environ['http_proxy']=proxy
+#	foo.write("\nvariable set is in make connection"+proxy+"\n")
+	foo.flush()
+	return conn
 
 
 #http://10.2.4.129:8773/services/cloud   +  10.2.4.129:8773 + 8773 + /services/cloud
@@ -25,8 +34,15 @@ def make_connection():
 def spawn_instances(conn, number, 
                     image_id = config.default_image_id, 
                     flavor = config.master_instance_flavor):
-    return conn.run_instances(image_id, int(number), int(number),config.keyName, None, flavor)
+	#proxy=os.environ['http_proxy']
+	foo=open("foo.txt","a+")
 
+	#del os.environ['http_proxy']
+	connx=conn.run_instances(image_id, int(number), int(number),config.keyName, None, flavor)
+	#os.environ['http_proxy']=proxy
+	#foo.write("\nvariable set is in make connection"+proxy+"\n")
+	foo.flush()
+	return connx
 
 #def spawn_instances(conn, number, 
 #                    image_id = "ami-0000001a", 

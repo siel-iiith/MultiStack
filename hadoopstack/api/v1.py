@@ -5,6 +5,14 @@ from hadoopstack.services.cluster import spawn_instances
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
 from hadoopstack.services.associateIP import associatePublicIp
+from hadoopstack.services.connectToMaster import connectMaster
+#from hadoopstack.services.prepareProperties import preparePropertyFile
+from hadoopstack.services.prepareProperties import preparePropertyFile
+
+
+import os
+
+
 import simplejson
 
 app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
@@ -103,6 +111,10 @@ def clusters():
         conn=make_connection()
         reservationId=spawn_instances(conn,num_vms)
 	reserveId=reservationId.id
+	foo.write("here is the big show\n")
+#foo.write(str(os.environ['http_proxy']))
+	foo.flush()
+
         allVMDetails=getVMid(conn,reserveId)
 	foo.write("yada yada yada")
 	foo.write(str([i[0] for i in allVMDetails]))
@@ -118,8 +130,10 @@ def clusters():
 #	clusterDetails['created_at']=[i[1] for i in allVMDetails]
 #	clusterDetails['updated_at']="NA"
 #	clusterDetails['status']=[i[2] for i in allVMDetails]
-	associatePublicIp(conn,reserveId)
-		
+	masterIp=associatePublicIp(conn,reserveId)
+	preparePropertyFile(conn,reserveId)
+	connectMaster(masterIp,conn)
+
 	id_t=str(clusterDetails['_id'])
 	foo.write("sTr"+str(simplejson.dumps(id_t))+"sTr")
 	clusterDetails['_id']=simplejson.dumps(id_t)	
