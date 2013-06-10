@@ -5,15 +5,14 @@ from hadoopstack.services.cluster import make_connection
 from hadoopstack.services.cluster import spawn_instances
 
 from hadoopstack.services import job
+from hadoopstack.services import cluster
 
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
 
+import hadoopstack.main
+
 app_v1 = Blueprint('v1', __name__, url_prefix='/v1')
-
-mongo = PyMongo()
-clusterDetails={}
-
 
 @app_v1.route('/')
 def version():
@@ -32,11 +31,13 @@ def jobs():
 def clusters():
     if request.method == 'POST':
         data = request.json
-    #mongo.db.cluster.insert(data)
-        num_tt = int(data['cluster']['node-recipes']['tasktracker'])
-        num_jt = int(data['cluster']['node-recipes']['jobtracker'])        
-        num_vms = num_jt + num_tt
-    
+        
+        # This inserts the complete json post data in Mongo
+        hadoopstack.main.mongo.db.clusters.insert(data)
+        cluster.setup(data)
+        return "Cluster Spawned\n"
+
+    return "To Be Implemented"
     foo = open("foo.txt", "a")
     #print "Name of the file: ", foo.name
     foo.write("hello there ")

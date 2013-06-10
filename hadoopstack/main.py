@@ -1,23 +1,18 @@
 import os
 from flask import Flask
 from hadoopstack.api.v1 import app_v1
-from hadoopstack.api.v1 import mongo
 from flask.ext.pymongo import PyMongo
-#from hadoopstack.main import mongo
-#from mongokit import Connection,Document
+sahni = 1
 
 app = Flask(__name__)
-#app.config['MONGO_DBNAME']="clusterDB"
-app.config.from_object('config')
-
+app.config.from_object('hadoopstack.config')
 
 app.register_blueprint(app_v1)
-#mongo = PyMongo(app)
-mongo.init_app(app,config_prefix="MONGO")
+
+mongo = PyMongo(app)
 
 @app.route('/')
 def default():
-#    return app.name
     return app.name + " running and Current API is v1 accessible on url prefix /v1/"
 
 if __name__ == '__main__':
