@@ -26,7 +26,7 @@ def spawn_instances(conn,
                     image_id = config.DEFAULT_IMAGE_ID, 
                     flavor = config.DEFAULT_FLAVOR):
     
-    return conn.run_instances(image_id, int(number), int(number), None, None, flavor)
+    return conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
 
 def create_keypair(conn, keypair_name):
     
@@ -90,16 +90,20 @@ def setup(data):
     conn = make_connection()
     create_keypair(conn, keypair_name)
     create_security_groups(conn, cluster_name)
-    spawn_instances(
+    res_tt = spawn_instances(
         conn, 
         data['cluster']['node-recipes']['tasktracker'], 
         keypair_name,
         [sec_tt_name]
         )
-    spawn_instances(
+
+    res_jt = spawn_instances(
         conn, 
         data['cluster']['node-recipes']['jobtracker'], 
         keypair_name,
         [sec_jt_name]
         )
+
+    # Assign Public IP to jobtracker. Rest of the communication is to be done
+    # through Internal IPs
     return

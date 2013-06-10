@@ -35,6 +35,8 @@ def clusters():
         # This inserts the complete json post data in Mongo
         hadoopstack.main.mongo.db.clusters.insert(data)
         cluster.setup(data)
+
+        # Need to return an ID after sucessful completion
         return "Cluster Spawned\n"
 
     return "To Be Implemented"
