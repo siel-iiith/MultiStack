@@ -35,3 +35,4 @@ venv
 .project
 .pydevproject
 hadoopstack/services/config.py
+hadoopstack/tests/courseDetails

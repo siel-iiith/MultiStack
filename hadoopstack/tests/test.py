@@ -10,9 +10,9 @@ urlchoice1 = "http://localhost:5000/v1/clusters/"
 urlchoice2= "http://localhost:5000/v1/"
 
 if(sys.argv[1]=="/"):
-	url=urlchoice2
+    url=urlchoice2
 else:
-	url=urlchoice1
+    url=urlchoice1
 
 
 urlx = "http://localhost:8000/measure"
