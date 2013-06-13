@@ -53,9 +53,9 @@ JOBTRACKER_URI=`grep -i jobtracker $PROPERTIES_FILE | cut -f 2`
 DFS_REPLICATION=2
 NN_FORMAT=1
 NAMENODE=`grep -i namenode $PROPERTIES_FILE  | tr -s ' ' | cut -f 2 -d' '| cut -d ":" -f 1`
-DATANODE=`grep -i datanode $PROPERTIES_FILE  tr -s ' ' | cut -f 2 -d' '`
+DATANODE=`grep -i datanode $PROPERTIES_FILE  | tr -s ' ' | cut -f 2 -d' '`
 JOBTRACKER=`grep -i jobtracker $PROPERTIES_FILE  | tr -s ' ' | cut -f 2 -d' '| cut -d ":" -f 1`
-TASKTRACKER=`grep -i tasktracker $PROPERTIES_FILE  tr -s ' ' | cut -f 2 -d' '`
+TASKTRACKER=`grep -i tasktracker $PROPERTIES_FILE  | tr -s ' ' | cut -f 2 -d' '`
 
 while getopts "r:u:j:p:d:vhmf" opt; do
    case $opt in
