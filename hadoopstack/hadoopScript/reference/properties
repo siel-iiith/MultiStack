@@ -1,0 +1,3 @@
+jobtracker	172.17.12.15:54311	10.2.4.69
+tasktracker	172.17.12.16
+tasktracker	172.17.12.17
