@@ -8,7 +8,7 @@ def associatePublicIp(conn, reserveId):
     listDetails = getVMid(conn,reserveId)
 
     ipToReturn=""
-#for obj in mongo.db.cluster.find(): allEle.append(obj)
+    #for obj in mongo.db.cluster.find(): allEle.append(obj)
     foo=open("ru.txt","w")
     foo.write(str(listDetails))
     foo.write(str(listDetails[0][0].split(":")[1]))
@@ -29,5 +29,4 @@ def associatePublicIp(conn, reserveId):
     foo.write(str(ipPool))
 
     return ipToReturn
-#allEle[
-#for r in conn.get_all_addresses():
+
