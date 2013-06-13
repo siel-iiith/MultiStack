@@ -29,9 +29,8 @@ def spawn_instances(conn,
                     image_id = config.DEFAULT_IMAGE_ID, 
                     flavor = config.DEFAULT_FLAVOR):
     
-    connx=conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
-    #connx = conn.run_instances(image_id, int(number), int(number),config.keyName, None, flavor)
-    #instance=connx.instances[0]
+    connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
+    
     while connx.instances[0].state == "pending":
         for res in conn.get_all_instances():
             if res.id == connx.id:
@@ -39,13 +38,11 @@ def spawn_instances(conn,
         sleep(1)
     return connx
 
-
 def create_keypair(conn, keypair_name):
     
     keypair = conn.create_key_pair(keypair_name)
     keypair.save("/tmp")
     # TODO - Save this keypair file in the mongodb
-
 
 def create_security_groups(conn, cluster_name):
 
@@ -116,7 +113,7 @@ def setup(data):
         [sec_jt_name]
         )
 
-    listToReturn=[]
+    listToReturn = []
     listToReturn.append(res_jt)
     listToReturn.append(res_tt)
     # Assign Public IP to jobtracker. Rest of the communication is to be done
