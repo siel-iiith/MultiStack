@@ -5,8 +5,8 @@
 
 script_hadoop_install="https://raw.github.com/dharmeshkakadia/Hadoop-Scripts/master/hadoop_install.sh"
 ssh_copy_id="https://github.com/shredder12/Hadoop-Scripts/raw/master/ssh-id-copy.sh"
-hadoop_download="http://apache.techartifact.com/mirror/hadoop/common/hadoop-1.1.0/hadoop-1.1.0-bin.tar.gz"
-
+#hadoop_download="http://apache.techartifact.com/mirror/hadoop/common/hadoop-1.1.0/hadoop-1.1.0-bin.tar.gz"
+hadoop_download="http://archive.apache.org/dist/hadoop/core/hadoop-1.1.0/hadoop-1.1.0-bin.tar.gz"
 chmod 0600 $1
 
 wget $hadoop_download
