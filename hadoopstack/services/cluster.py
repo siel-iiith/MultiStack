@@ -1,10 +1,10 @@
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 
-from hadoopstack.services import config
+#from hadoopstack.services import config
 #from hadoopstack.services.config import *
 
-#from hadoopstack import config
+from hadoopstack import config
 from time import sleep
 def make_connection():
     url = config.EC2_URL
