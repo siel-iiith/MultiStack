@@ -88,10 +88,10 @@ def clusters():
         masterIp=associatePublicIp(conn,reserveId)
         preparePropertyFile(conn,reserveId)
         #connectMaster(masterIp,conn)
-        #id_t=str(clusterDetails['_id'])
-        #clusterDetails['_id']=simplejson.dumps(id_t)	
-        #POSTout['CID']=id_t
-        #return jsonify(**POSTout)
+        id_t=str(clusterDetails['_id'])
+        clusterDetails['_id']=simplejson.dumps(id_t)	
+        POSTout['CID']=id_t
+        return jsonify(**POSTout)
 
  
         # Need to return an ID after sucessful completion

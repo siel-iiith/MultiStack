@@ -1,5 +1,5 @@
 came here 
-[('Instance:i-00000622', '2013-06-13T03:25:08.000Z', 'running', 'r-0yb1wxyr'), ('Instance:i-00000621', '2013-06-13T03:24:51.000Z', 'running', 'r-gib2zzb4')]recipeList
+[('Instance:i-00000625', '2013-06-13T03:36:54.000Z', 'running', 'r-lb3nvzvv'), ('Instance:i-00000626', '2013-06-13T03:37:10.000Z', 'running', 'r-913yy05y')]recipeList
 ['jobtracker', 'tasktracker']reservation ID
-[u'r-0yb1wxyr', u'r-gib2zzb4']
-{'status': '["running", "running"]', 'created_at': '["2013-06-13T03:25:08.000Z", "2013-06-13T03:24:51.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449", "61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000622"}, {"role": "tasktracker", "id": "Instance:i-00000621"}]', 'user': 'penguinRaider', 'stack': 'hadoop'}
+[u'r-913yy05y', u'r-lb3nvzvv']
+{'status': '["running", "running"]', 'created_at': '["2013-06-13T03:36:54.000Z", "2013-06-13T03:37:10.000Z"]', 'userId': '["61cc05ad3b3343cd9c2bd6243a834449", "61cc05ad3b3343cd9c2bd6243a834449"]', 'updated_at': 'NA', 'VMids': '[{"role": "jobtracker", "id": "Instance:i-00000625"}, {"role": "tasktracker", "id": "Instance:i-00000626"}]', 'user': 'penguinRaider', 'stack': 'hadoop'}

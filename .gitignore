@@ -34,9 +34,6 @@ venv
 .mr.developer.cfg
 .project
 .pydevproject
-<<<<<<< HEAD
 hadoopstack/services/config.py
 hadoopstack/tests/courseDetails
-=======
 config.py
->>>>>>> e939ada71409a5b2ecb2b1b2a8dd1c3c5973044f
