@@ -4,7 +4,6 @@ from flask.ext.pymongo import PyMongo
 from hadoopstack.services import job
 from hadoopstack.services import cluster
 
-import os
 import simplejson
 import json
 import hadoopstack.main
@@ -42,7 +41,7 @@ def jobs():
         return "To Be Implemented"
 
 @app_v1.route('/clusters/', methods = ['GET','POST'])
-def clusters():
+def clusters_api():
     '''
         Cluster API
     '''
@@ -50,5 +49,13 @@ def clusters():
         data = request.json
         cid = cluster.create(data)
         return jsonify(**cid)
-     
+
     return "To Be Implemented"
+
+@app_v1.route('/clusters/<cluster_id>', methods = ['GET','DELETE'])
+def cluster_api(cluster_id):
+    if request.method == "DELETE":
+        return cluster.delete(cluster_id)
+
+    return "To Be Implemented"
+
