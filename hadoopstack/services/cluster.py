@@ -1,11 +1,19 @@
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 
-#from hadoopstack.services import config
-#from hadoopstack.services.config import *
-
 from hadoopstack import config
 from time import sleep
+
+import hadoopstack
+import simplejson
+
+from hadoopstack.dbOperations.db import getVMid
+from hadoopstack.dbOperations.makedict import fetchDict
+from hadoopstack.services.associateIP import associatePublicIp
+from hadoopstack.services.connectToMaster import connectMaster
+from hadoopstack.services.prepareProperties import preparePropertyFile
+
+
 def make_connection():
     url = config.EC2_URL
     url_endpoint = url.split('/')[2]
@@ -22,7 +30,7 @@ def make_connection():
                     region = hs_region)
     return conn
 
-def spawn_instances(conn, 
+def boot_instances(conn, 
                     number, 
                     keypair,
                     security_groups,
@@ -89,7 +97,17 @@ def create_security_groups(conn, cluster_name):
         to_port = -1,
         cidr_ip = "0.0.0.0/0")
 
-def setup(data):
+def associate_public_ip(conn, instance_id):
+    for addr in conn.get_all_addresses():
+        if addr.instance_id is '':
+            addr.associate(instance_id)
+            return
+
+    addr = conn.allocate_address()
+    addr.associate(instance_id)
+    print "IP Associated:", addr.public_ip
+
+def spawn(data):
 
     cluster_name = data['cluster']['name']
     keypair_name = "hadoopstack-" + cluster_name
@@ -99,14 +117,14 @@ def setup(data):
     conn = make_connection()
     create_keypair(conn, keypair_name)
     create_security_groups(conn, cluster_name)
-    res_tt = spawn_instances(
+    res_tt = boot_instances(
         conn, 
         data['cluster']['node-recipes']['tasktracker'], 
         keypair_name,
         [sec_tt_name]
         )
 
-    res_jt = spawn_instances(
+    res_jt = boot_instances(
         conn, 
         data['cluster']['node-recipes']['jobtracker'], 
         keypair_name,
@@ -116,6 +134,34 @@ def setup(data):
     listToReturn = []
     listToReturn.append(res_jt)
     listToReturn.append(res_tt)
-    # Assign Public IP to jobtracker. Rest of the communication is to be done
-    # through Internal IPs
+
+    associate_public_ip(conn, res_jt.instances[0].id)
+
     return conn,listToReturn
+
+def create(data):
+
+    # TODO: We need to create an request check filter before inserting
+
+    conn,reservationId = spawn(data)
+    
+    reserveId = [ i.id for i in reservationId]
+    allVMDetails = getVMid(conn,reserveId)
+    
+    num_tt = int(data['cluster']['node-recipes']['tasktracker'])
+    num_jt = int(data['cluster']['node-recipes']['jobtracker'])       
+
+    recipeList = []
+    [recipeList.append("jobtracker")    for i in xrange(0,num_jt)]
+    [recipeList.append("tasktracker")   for i in xrange(0,num_tt)]
+    
+    clusterDetails = fetchDict(conn, allVMDetails, recipeList, reserveId)
+    hadoopstack.main.mongo.db.cluster.insert(clusterDetails)
+    
+    preparePropertyFile(conn,reserveId)
+    
+    id_t = str(clusterDetails['_id'])
+    clusterDetails['_id'] = simplejson.dumps(id_t) 
+    create_ret = {}
+    create_ret['CID'] = id_t
+    return create_ret
