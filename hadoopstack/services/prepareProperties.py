@@ -1,12 +1,6 @@
-#labelList=lambda x: 
-
 def writePropertiesFiles(propertiesFile,completeList):
     for x in completeList:
         element=x[1]
-        #stringToWrite=element
-        #propertiesFile.write("yada\n")
-        #stringToWrite=""
-        #stringToWrite = "%s%s%s%s%s\n"%(str(element),"\t",str(x[0][1]),"\t",str(x[0][0])) if element=="jobtracker" else str(element)+"\t"+str(x[0][1])+"\n"
         stringToWrite = '{0}{1}{2}:54311{3}{4}\n'.format(\
                         str(element)," "*(4),\
                         str(x[0][1])," "*(4),\
@@ -32,10 +26,5 @@ def preparePropertyFile(conn,currentReservationId):
                    else "jobtracker"  ,   ipList)
     completeList=map(lambda x,y:(x,y) ,ipList,labelList)
     writePropertiesFiles(propertiesFile,completeList)
-    #propertiesFile.write(str(allIPs))
-    #propertiesFile.write(str(allPrivateIPs))
-    #propertiesFile.write(str(ipList))
-    #propertiesFile.write(str(labelList))
-    #propertiesFile.write(str(completeList))
     propertiesFile.flush()
     print "hello"
