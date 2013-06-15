@@ -9,10 +9,10 @@ import simplejson
 
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
-from hadoopstack.services.associateIP import associatePublicIp
 from hadoopstack.services.connectToMaster import connectMaster
 from hadoopstack.services.prepareProperties import preparePropertyFile
 
+from bson import objectid
 
 def make_connection():
     url = config.EC2_URL
@@ -29,6 +29,16 @@ def make_connection():
                     path = url_path,
                     region = hs_region)
     return conn
+
+def associate_public_ip(conn, instance_id):
+    for addr in conn.get_all_addresses():
+        if addr.instance_id is '':
+            addr.associate(instance_id)
+            return
+
+    addr = conn.allocate_address()
+    addr.associate(instance_id)
+    print "IP Associated:", addr.public_ip
 
 def boot_instances(conn, 
                     number, 
@@ -97,15 +107,10 @@ def create_security_groups(conn, cluster_name):
         to_port = -1,
         cidr_ip = "0.0.0.0/0")
 
-def associate_public_ip(conn, instance_id):
-    for addr in conn.get_all_addresses():
-        if addr.instance_id is '':
-            addr.associate(instance_id)
-            return
-
-    addr = conn.allocate_address()
-    addr.associate(instance_id)
-    print "IP Associated:", addr.public_ip
+def refresh(conn, reservation_id):
+    for res in conn.get_all_instances():
+        if reservation_id == res.id:
+            return res
 
 def spawn(data):
 
@@ -156,6 +161,7 @@ def create(data):
     [recipeList.append("tasktracker")   for i in xrange(0,num_tt)]
     
     clusterDetails = fetchDict(conn, allVMDetails, recipeList, reserveId)
+    clusterDetails['name'] = data['cluster']['name']
     hadoopstack.main.mongo.db.cluster.insert(clusterDetails)
     
     preparePropertyFile(conn,reserveId)
@@ -163,5 +169,48 @@ def create(data):
     id_t = str(clusterDetails['_id'])
     clusterDetails['_id'] = simplejson.dumps(id_t) 
     create_ret = {}
-    create_ret['CID'] = id_t
+    create_ret['cid'] = id_t
     return create_ret
+
+def delete(cid):
+    cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]
+    print cluster_info
+    cluster_name = cluster_info['name']
+    conn = make_connection()
+
+    keypair = 'hadoopstack-' + cluster_name
+    security_groups = ['hadoopstack-' + cluster_name + '-jobtracker', 
+                'hadoopstack-' + cluster_name + '-tasktracker']
+
+    flag = True
+    while flag:
+        flag = False
+        for res in conn.get_all_instances():
+            for instance in res.instances:
+                for vm in cluster_info['VMids']:
+                    if instance.id == str(vm['id']):
+                        instance.terminate()
+                        flag = True
+                        continue
+
+    print "Terminated Instances"
+
+    try:
+        for kp in conn.get_all_key_pairs(keynames = [keypair]):
+            kp.delete()
+
+        print "Terminated keypairs"
+
+    except:
+        print "Error while deleting Keypair"
+
+    try:
+        for sg in conn.get_all_security_groups(groupnames = security_groups):
+            print sg.delete() 
+        
+        print "Terminated Security Groups"
+
+    except:
+        print "Error while deleting Security Groups"
+
+    return ('Deleted Cluster', 200)
