@@ -40,6 +40,11 @@ def associate_public_ip(conn, instance_id):
     addr.associate(instance_id)
     print "IP Associated:", addr.public_ip
 
+def release_public_ips(conn, public_ips_list):
+    for addr in conn.get_all_addresses():
+        if (addr.public_ip in public_ips_list) and addr.instance_id is None:
+            addr.release()
+
 def boot_instances(conn, 
                     number, 
                     keypair,
@@ -187,6 +192,8 @@ def delete(cid):
     '''
     
     flag = True
+    public_ips = []
+
     while flag:
         flag = False
         for res in conn.get_all_instances():
@@ -194,6 +201,9 @@ def delete(cid):
                 for vm in cluster_info['VMids']:
                     if instance.id == str(vm['id']):
                         try:
+                            if instance.ip_address != instance.private_ip_address:
+                                if instance.ip_address not in public_ips:
+                                    public_ips.append(str(instance.ip_address))
                             instance.terminate()
                         except:
                             pass
@@ -219,5 +229,7 @@ def delete(cid):
 
     except:
         print "Error while deleting Security Groups"
+
+    release_public_ips(conn, public_ips)
 
     return ('Deleted Cluster', 200)
