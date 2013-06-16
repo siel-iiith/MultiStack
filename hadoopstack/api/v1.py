@@ -34,11 +34,16 @@ def version():
 
 @app_v1.route('/jobs/', methods=['GET', 'POST'])
 def jobs():
+    '''
+        Job API
+    '''
     if request.method == 'GET':
         return ' '.join(job.jobs_list)
 
     elif request.method == 'POST':
-        return "To Be Implemented"
+        data = request.json
+        job_id = job.create(data)
+        return jsonify(**job_id)
 
 @app_v1.route('/clusters/', methods = ['GET','POST'])
 def clusters_api():
