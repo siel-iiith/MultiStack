@@ -107,11 +107,6 @@ def create_security_groups(conn, cluster_name):
         to_port = -1,
         cidr_ip = "0.0.0.0/0")
 
-def refresh(conn, reservation_id):
-    for res in conn.get_all_instances():
-        if reservation_id == res.id:
-            return res
-
 def spawn(data):
 
     cluster_name = data['cluster']['name']
@@ -182,6 +177,15 @@ def delete(cid):
     security_groups = ['hadoopstack-' + cluster_name + '-jobtracker', 
                 'hadoopstack-' + cluster_name + '-tasktracker']
 
+
+    '''
+    
+    Instances take a while to terminate, till then their status is
+    'shutting-down'. Complete termination is required for deletion  of
+    Security Groups. Hence, we use a loop to verify complete termination.
+
+    '''
+    
     flag = True
     while flag:
         flag = False
@@ -189,7 +193,10 @@ def delete(cid):
             for instance in res.instances:
                 for vm in cluster_info['VMids']:
                     if instance.id == str(vm['id']):
-                        instance.terminate()
+                        try:
+                            instance.terminate()
+                        except:
+                            pass
                         flag = True
                         continue
 
