@@ -1,5 +1,10 @@
 #!/bin/bash
-#curl --dump-header  -v -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "{\"uid\":12,\"token\":\"asdert\"}" http://localhost:5000/v1/
+
+# ./cluster_test.sh <action>
+# list -> Get a list of all clusters
+# create -> Create a Cluster
+# Delete -> Delete a Cluster
+
 unset http_proxy
 unset HTTP_PROXY
 unset all_proxy
@@ -20,9 +25,14 @@ create()
     http://localhost:5000/v1/clusters/
 }
 
-if [ ! -z $1 ]
-then
-    delete $1
-else
-    create
-fi
+case $1 in
+    list)
+        get
+        ;;
+    create)
+        create
+        ;;
+    delete)
+        delete $2
+        ;;
+esac
