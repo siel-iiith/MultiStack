@@ -1,5 +1,6 @@
 import simplejson
 import os
+import time
 
 def jobDict(data):
 
@@ -11,10 +12,17 @@ def jobDict(data):
     jobDetails['user'] = "Stark"
     jobDetails['description'] = "Game of Thrones"
     jobDetails['assigned_to_cluster'] = "NA"
-    jobDetails['submission_time'] = data['jobs']['deadline']
+    # When the job is submitted. Lets save epoch for the time being.
+    jobDetails['submission_time'] = time.time()
+    # When the job is started/scheduled
     jobDetails['start_time'] = "12"
+    # When the jop has finished
     jobDetails['end_time'] = "7"
+    # How much time left
     jobDetails['estimated_duration'] = "5"
+    # Deadline to be met by user
+    jobDetails['deadline'] = data['jobs']['deadline']
+    # Running/Completed/Deleted etc.
     jobDetails['current_status'] = "running"
 
     return jobDetails

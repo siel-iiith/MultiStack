@@ -32,10 +32,10 @@ def version():
     return "v1 API. Jobs and clusters API are accessible at /jobs and \
     /clusters respectively"
 
-@app_v1.route('/jobs/', methods=['GET', 'POST'])
-def jobs():
+@app_v1.route('/jobs', methods=['GET', 'POST'])
+def jobs_api():
     '''
-        Job API
+        Jobs API
     '''
     if request.method == 'GET':
         return ' '.join(job.jobs_list)
@@ -45,7 +45,7 @@ def jobs():
         job_id = job.create(data)
         return jsonify(**job_id)
 
-@app_v1.route('/clusters/', methods = ['GET','POST'])
+@app_v1.route('/clusters', methods = ['GET','POST'])
 def clusters_api():
     '''
         Cluster API
