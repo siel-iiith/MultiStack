@@ -45,6 +45,14 @@ def jobs_api():
         job_id = job.create(data)
         return jsonify(**job_id)
 
+@app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
+def job_api(job_id):
+    if request.method == 'GET':
+        return ' '.join(job.jobs_list)
+
+    elif request.method == "DELETE":
+        return job.delete(job_id)
+
 @app_v1.route('/clusters', methods = ['GET','POST'])
 def clusters_api():
     '''
