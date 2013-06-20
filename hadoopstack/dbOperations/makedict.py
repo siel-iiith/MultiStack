@@ -23,7 +23,7 @@ def jobDict(data):
     # Deadline to be met by user
     jobDetails['deadline'] = data['jobs']['deadline']
     # Running/Completed/Deleted etc.
-    jobDetails['current_status'] = "running"
+    jobDetails['status'] = "running"
 
     return jobDetails
 
