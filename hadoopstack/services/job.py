@@ -23,3 +23,13 @@ def create(data):
     create_ret = {}
     create_ret['job_id'] = id_t
     return create_ret
+
+
+def delete(job_id):
+
+    job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(job_id)})[0]
+
+    # Not Actually deleted the job from the Database, setting the status to DELETED
+    job_info['status'] = "deleted"
+
+    return ('Deleted Job', 200)
