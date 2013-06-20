@@ -29,6 +29,11 @@ def delete(job_id):
 
     job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(job_id)})[0]
 
-    hadoopstack.main.mongo.db.job.remove({"_id": objectid.ObjectId(job_id)})
+    #hadoopstack.main.mongo.db.job.remove({"_id": objectid.ObjectId(job_id)})
+
+    # Not Actually deleted the job from the Database, setting the status to DELETED
+    job_info['current_status'] = "deleted"
+
+    #print job_info
 
     return ('Deleted Job', 200)
