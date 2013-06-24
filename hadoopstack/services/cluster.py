@@ -168,8 +168,6 @@ def create(data):
     hadoopstack.main.mongo.db.cluster.insert(clusterDetails)
     
     allIPs,allPrivateIPs=preparePropertyFile(conn,reserveId)
-    print allIPs
-    print allPrivateIPs
     allPublicIPs=filter(lambda x: x!="0.0.0.0" , map(lambda x,y:x if x!=y else "0.0.0.0" ,allIPs,allPrivateIPs))
     connectMaster(allPublicIPs[0],keypair_name) 
     id_t = str(clusterDetails['_id'])

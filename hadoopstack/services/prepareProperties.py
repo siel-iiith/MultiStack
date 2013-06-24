@@ -28,4 +28,3 @@ def preparePropertyFile(conn,currentReservationId):
     writePropertiesFiles(propertiesFile,completeList)
     propertiesFile.flush()
     return allIPs,allPrivateIPs
-    #print "hello"
