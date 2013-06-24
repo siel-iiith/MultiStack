@@ -16,9 +16,9 @@ def writePropertiesFiles(propertiesFile,completeList):
 
 
 def preparePropertyFile(conn,currentReservationId):
-    propertiesFile=open("properties","w")
+    propertiesFile=open("./hadoopstack/services/toTransfer/properties","w")
     allIPs=[ i.ip_address for r in conn.get_all_instances() if r.id in\
-            currentReservationId for i in r.instances]
+            currentReservationId for i in r.instances]      #NOTE:all the public IPs
     allPrivateIPs=[ i.private_ip_address for r in conn.get_all_instances()\
                     if r.id in currentReservationId for i in r.instances]
     ipList=map(lambda x,y :(x,y) ,allIPs,allPrivateIPs) 
@@ -27,4 +27,5 @@ def preparePropertyFile(conn,currentReservationId):
     completeList=map(lambda x,y:(x,y) ,ipList,labelList)
     writePropertiesFiles(propertiesFile,completeList)
     propertiesFile.flush()
-    print "hello"
+    return allIPs,allPrivateIPs
+    #print "hello"

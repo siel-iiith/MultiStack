@@ -11,6 +11,8 @@ from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
 from hadoopstack.services.connectToMaster import connectMaster
 from hadoopstack.services.prepareProperties import preparePropertyFile
+from hadoopstack.services.connectToMaster import connectMaster
+
 
 from bson import objectid
 
@@ -64,7 +66,8 @@ def boot_instances(conn,
 def create_keypair(conn, keypair_name):
     
     keypair = conn.create_key_pair(keypair_name)
-    keypair.save("/tmp")
+    keypair.save("./hadoopstack/services/toTransfer")
+#    hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
     # TODO - Save this keypair file in the mongodb
 
 def create_security_groups(conn, cluster_name):
@@ -142,13 +145,13 @@ def spawn(data):
 
     associate_public_ip(conn, res_jt.instances[0].id)
 
-    return conn,listToReturn
+    return conn,listToReturn,keypair_name
 
 def create(data):
 
     # TODO: We need to create an request check filter before inserting
 
-    conn,reservationId = spawn(data)
+    conn,reservationId,keypair_name = spawn(data)
     
     reserveId = [ i.id for i in reservationId]
     allVMDetails = getVMid(conn,reserveId)
@@ -164,8 +167,11 @@ def create(data):
     clusterDetails['name'] = data['cluster']['name']
     hadoopstack.main.mongo.db.cluster.insert(clusterDetails)
     
-    preparePropertyFile(conn,reserveId)
-    
+    allIPs,allPrivateIPs=preparePropertyFile(conn,reserveId)
+    print allIPs
+    print allPrivateIPs
+    allPublicIPs=filter(lambda x: x!="0.0.0.0" , map(lambda x,y:x if x!=y else "0.0.0.0" ,allIPs,allPrivateIPs))
+    connectMaster(allPublicIPs[0],keypair_name) 
     id_t = str(clusterDetails['_id'])
     clusterDetails['_id'] = simplejson.dumps(id_t) 
     create_ret = {}
