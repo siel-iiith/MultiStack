@@ -38,7 +38,11 @@ def jobs_api():
         Jobs API
     '''
     if request.method == 'GET':
-        return ' '.join(job.jobs_list)
+        get_output = []
+        for i in list(hadoopstack.main.mongo.db.job.find()):
+            get_output.append(i["name"])
+
+        return "\n".join(get_output)
 
     elif request.method == 'POST':
         data = request.json
@@ -48,7 +52,11 @@ def jobs_api():
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):
     if request.method == 'GET':
-        return ' '.join(job.jobs_list)
+        get_output = []
+        for i in list(hadoopstack.main.mongo.db.job.find()):
+            get_output.append(i["name"])
+
+        return "\n".join(get_output)
 
     elif request.method == "DELETE":
         return job.delete(job_id)

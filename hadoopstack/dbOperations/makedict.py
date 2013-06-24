@@ -22,8 +22,8 @@ def jobDict(data):
     jobDetails['estimated_duration'] = "5"
     # Deadline to be met by user
     jobDetails['deadline'] = data['jobs']['deadline']
-    # Running/Completed/Deleted etc.
-    jobDetails['status'] = "running"
+    # Running/Completed/Deleted/waiting/pending
+    jobDetails['status'] = "pending"
 
     return jobDetails
 
