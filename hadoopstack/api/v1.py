@@ -40,23 +40,19 @@ def jobs_api():
     '''
         Jobs API
     '''
+    
     if request.method == 'GET':
-        get_output = []
-        for i in list(hadoopstack.main.mongo.db.job.find()):
-            get_output.append(i["name"])
-        return "\n".join(get_output)
+        return jsonify(job.job_list())
 
     elif request.method == 'POST':
         data = request.json
         job_id = job.create(data)
-
-        a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id']) })
-        a['status']='waiting'
+        print job_id
+        a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id'])})
+        a['status'] = 'waiting'
         hadoopstack.main.mongo.db.job.save(a)
-
         # Calling the Scheduler
         job.Scheduler(job_id)
-
         # @Todo: To work with threads/ to multiple request to enable this: 
 #       payload = {'cluster':{'name':str(int(random.random()*10000)), 'node-recipes': {'tasktracker':2,'jobtracker':1},'image-id':'ubuntu-12.04-amd64.img'}} 
 #       headers = {'content-type': 'application/json', 'accept': 'application/json'}
@@ -64,21 +60,16 @@ def jobs_api():
 #       r = requests.post("http://127.0.0.1:5000/v1/clusters", data=json.dumps(payload), headers=headers)
         
         # @Todo: To associate the cluster id to the job.  
-        a['status']='completed'
+        a['status'] = "completed"
         hadoopstack.main.mongo.db.job.save(a)
-#        hadoopstack.main.mongo.db.job.remove()
-          
         return jsonify(**job_id)
 
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):
-    if request.method == 'GET':
-        get_output = []
-        for i in list(hadoopstack.main.mongo.db.job.find(job_id)):
-            get_output.append(i["name"])
-        
-        return "\n".join(get_output)
 
+    if request.method == "GET":        
+        return jsonify(job.info(job_id))
+        
     elif request.method == "DELETE":
         return job.delete(job_id)
 

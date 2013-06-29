@@ -26,6 +26,11 @@ get()
     curl http://localhost:5000/v1/jobs
 }
 
+info()
+{
+    curl http://localhost:5000/v1/jobs/$1
+}
+
 case $1 in
     list)
         get
@@ -35,5 +40,8 @@ case $1 in
         ;;
     delete)
         delete $2
+        ;;
+    info)
+        info $2
         ;;
 esac

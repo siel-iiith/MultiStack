@@ -13,7 +13,7 @@ def jobDict(data):
     jobDetails['description'] = "Game of Thrones"
     jobDetails['assigned_to_cluster'] = "NA"
     # When the job is submitted. Lets save epoch for the time being.
-    jobDetails['submission_time'] = datetime.datetime.utcnow()
+    jobDetails['submission_time'] = datetime.datetime.utcnow().isoformat()
     # When the job is started/scheduled
     jobDetails['start_time'] = "12"
     # When the jop has finished

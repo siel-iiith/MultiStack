@@ -17,7 +17,6 @@ delete()
 
 create()
 {
-    echo "reaching here"
     curl \
     -v   \
     -H "Accept: application/json" \
