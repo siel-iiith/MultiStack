@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{%block navbar%} {{ super() }} {%endblock%}
+{% block content %}
+
+<div id="blog">
+    <div class="container">
+            <h3>List of all jobs</h3>
+     </div>
+</div>
+</hr>
+</br>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Name</th>
+<th>User</th>
+<th>Description</th>
+<th>Assigned to Cluster</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+{%for jlist in joblist%}
+<tr>
+<td>{{jlist.name}}</td>
+<td>{{jlist.user}}</td>
+<td>{{jlist.description}}</td>
+<td>{{jlist.assigned_to_cluster}}</td>
+<td>{{jlist.status}}</td>
+</tr>
+{%endfor%}
+</tbody>
+
+</table>
+
+{%endblock%}

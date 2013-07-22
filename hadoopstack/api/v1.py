@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-
+from flask import Blueprint, Flask, request, session, url_for, redirect, \
+     render_template, abort, g, flash, _app_ctx_stack, jsonify
 from hadoopstack.services import job
 from hadoopstack.services import cluster
 
@@ -18,7 +18,7 @@ def version():
         GET request of the cluster API
     '''
 
-    return
+    return render_template("welcome.html")
 
 @app_v1.route('/jobs', methods=['GET', 'POST'])
 def jobs_api():
@@ -27,12 +27,14 @@ def jobs_api():
     '''
     
     if request.method == 'GET':
-        return jsonify(job.job_list())
+        print job.job_list()['jobs']
+        return render_template("list_jobs.html",joblist=job.job_list()['jobs'])
 
     elif request.method == 'POST':
         data = request.json
+        print data
         job_id = job.create(data)
-        print job_id
+#print job_id
         a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id'])})
         a['status'] = 'waiting'
         hadoopstack.main.mongo.db.job.save(a)
