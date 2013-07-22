@@ -5,6 +5,7 @@
 <div id="blog">
     <div class="container">
             <h3>List of all jobs</h3>
+
      </div>
 </div>
 </hr>
@@ -12,25 +13,31 @@
 <table class="table table-striped">
 <thead>
 <tr>
-<th>Name</th>
-<th>User</th>
-<th>Description</th>
-<th>Assigned to Cluster</th>
-<th>Status</th>
+    <th>Name</th>
+    <th>User</th>
+    <th>Description</th>
+    <th>Assigned to Cluster</th>
+    <th>Status</th>
 </tr>
 </thead>
 <tbody>
 {%for jlist in joblist%}
 <tr>
-<td>{{jlist.name}}</td>
-<td>{{jlist.user}}</td>
-<td>{{jlist.description}}</td>
-<td>{{jlist.assigned_to_cluster}}</td>
-<td>{{jlist.status}}</td>
+    <td>{{jlist.name}}</td>
+    <td>{{jlist.user}}</td>
+    <td>{{jlist.description}}</td>
+    <td>{{jlist.assigned_to_cluster}}</td>
+    <td>{{jlist.status}}</td>
 </tr>
 {%endfor%}
 </tbody>
-
 </table>
-
+<!--
+<form>
+<button class="btn btn-large btn-block btn-success" type="submit"><a href="create_job.html" style="color:#fff;">Create a new Job</a></button>
+</form>
+-->
+<form action="{{url_for('.create_job')}}">
+<button class="btn btn-large btn-block btn-success" type="submit">Create a new Job</button>
+</form>
 {%endblock%}

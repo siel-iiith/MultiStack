@@ -237,3 +237,13 @@ def delete(cid):
     release_public_ips(conn, public_ips)
 
     return ('Deleted Cluster', 200)
+
+
+def cluster_list():
+    clusters_dict = {"clusters": []}
+    for i in list(hadoopstack.main.mongo.db.cluster.find()):
+        i["_id"] = str(i["_id"])
+        clusters_dict["jobs"].append(i)
+    return clusters_dict
+
+

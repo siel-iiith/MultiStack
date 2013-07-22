@@ -20,6 +20,10 @@ def version():
 
     return render_template("welcome.html")
 
+@app_v1.route('/create_job', methods=['GET'])
+def create_job():
+    return render_template("create_job.html")
+
 @app_v1.route('/jobs', methods=['GET', 'POST'])
 def jobs_api():
     '''
@@ -65,6 +69,9 @@ def clusters_api():
     '''
         Cluster API
     '''
+    if request.method == 'GET':
+        print cluster.cluster_list()['clusters']
+        return render_template("list_clusters.html",clusterlist=cluster.cluster_list()['clusters'])
     if request.method == 'POST':
         data = request.json
         cid = cluster.create(data)
