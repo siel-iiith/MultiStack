@@ -41,7 +41,9 @@ def jobs_api():
             return redirect(url_for(".create_job"))
         import pdb;pdb.set_trace()
         if not request.form['des']:
-            request.form['des'] = u'Test'
+            default_des = ""
+        else:
+            defaults_des = request.form['des']
         if not request.form['jar']:
             flash('Please enter the jar file')
             return redirect(url_for(".create_job"))
@@ -63,9 +65,9 @@ def jobs_api():
             return redirect(url_for(".create_job"))
         import pdb;pdb.set_trace()
         if not request.form['mi']:
-            default = u'1'
+            default_mi = u'1'
         else:
-            default = request.form['mi']
+            default_mi = request.form['mi']
         if not request.form['sf']:
             flash('Please enter the Slave Flavor')
             return redirect(url_for(".create_job"))
@@ -74,16 +76,20 @@ def jobs_api():
            flash('Please enter the Slave Instance')
            return redirect(url_for(".create_job"))
         if not request.form['dead']:
-            request.form['dead'] = u'Test'
+            default_dead = ""
+        else:
+            default_dead = request.form['dead']
         if not request.form['so']:
-            request.form['so'] = u'Special'
+            default_so = ""
+        else:
+            default_so = request.form['so']
         data = {}
         import pdb;pdb.set_trace()
-        data['jobs'] = {"name": request.form["name"], "description": request.form["des"] , "jar": request.form["jar"], \
+        data['jobs'] = {"name": request.form["name"], "description": default_des , "jar": request.form["jar"], \
                         "MainClass": request.form["mc"], "Input Path": request.form["ip"], "Output Path": request.form["op"], \
-                        "master": {"masterFlavor": request.form["mf"], "masterInstance": default}, \
+                        "master": {"masterFlavor": request.form["mf"], "masterInstance": default_mi}, \
                         "slave": {"slaveFlavor": request.form["sf"], "slaveInstance": request.form["slit"]}, \
-                        "deadline": request.form["dead"], "Special Option": request.form["so"]}
+                        "deadline": default_dead, "Special Option": default_so}
         import pdb;pdb.set_trace()
         print data
         job_id = job.create(data)
