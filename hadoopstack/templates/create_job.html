@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{%block navbar%} {{ super() }} {%endblock%}
+{% block content %}
+<form class="form-horizontal" method="post" style="margin-top:40px" action="{{ url_for('.jobs_api') }}">
+    <div class="control-group">
+        <label class="control-label" for="name">Name</label>
+        <div class="controls">
+            <input type="text" id="name" name="name" placeholder="Name">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="des">Description</label>
+        <div class="controls">
+            <input type="text" id="des" name="des" placeholder="Description">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="jar">Jar</label>
+        <div class="controls">
+            <input type="text" id="jar" name="jar" placeholder="jar file">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="mc">Mainclass</label>
+        <div class="controls">
+            <input type="text" id="mc" name="mc" placeholder="Mainclass">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="ip">Input Path</label>
+        <div class="controls">
+            <input type="text" id="ip" name="ip" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="op">Output Path</label>
+        <div class="controls">
+            <input type="text" id="op" name="op" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="mf">Master Flavor</label>
+        <div class="controls">
+            <input type="text" id="mf" name="mf" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="mi">Mater Instances</label>
+        <div class="controls">
+            <input type="text" id="mi" name="mi" placeholder="1">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="sf">Slave Flavour</label>
+        <div class="controls">
+            <input type="text" id="sf" name="sf" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="slit">Slave Instances</label>
+        <div class="controls">
+            <input type="text" id="slit" name="slit" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="dead">Deadline</label>
+        <div class="controls">
+            <input type="text" id="dead" name="dead" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="so">Special Option</label>
+        <div class="controls">
+            <input type="text" id="so" name="so" placeholder="">
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn">Submit</button>
+        </div>
+    </div>
+</form>
+{%endblock%}

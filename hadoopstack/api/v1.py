@@ -35,10 +35,58 @@ def jobs_api():
         return render_template("list_jobs.html",joblist=job.job_list()['jobs'])
 
     elif request.method == 'POST':
-        data = request.json
+        import pdb;pdb.set_trace()
+        if not request.form['name']:
+            flash('Please enter the name')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['des']:
+            request.form['des'] = u'Test'
+        if not request.form['jar']:
+            flash('Please enter the jar file')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['mc']:
+            flash('Please enter the Main Class')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['ip']:
+            flash('Please enter the Input Path')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['op']:
+            flash('Please enter the Output Path')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['mf']:
+            flash('Please enter the Master Flavor')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['mi']:
+            default = u'1'
+        else:
+            default = request.form['mi']
+        if not request.form['sf']:
+            flash('Please enter the Slave Flavor')
+            return redirect(url_for(".create_job"))
+        import pdb;pdb.set_trace()
+        if not request.form['slit']:
+           flash('Please enter the Slave Instance')
+           return redirect(url_for(".create_job"))
+        if not request.form['dead']:
+            request.form['dead'] = u'Test'
+        if not request.form['so']:
+            request.form['so'] = u'Special'
+        data = {}
+        import pdb;pdb.set_trace()
+        data['jobs'] = {"name": request.form["name"], "description": request.form["des"] , "jar": request.form["jar"], \
+                        "MainClass": request.form["mc"], "Input Path": request.form["ip"], "Output Path": request.form["op"], \
+                        "master": {"masterFlavor": request.form["mf"], "masterInstance": default}, \
+                        "slave": {"slaveFlavor": request.form["sf"], "slaveInstance": request.form["slit"]}, \
+                        "deadline": request.form["dead"], "Special Option": request.form["so"]}
+        import pdb;pdb.set_trace()
         print data
         job_id = job.create(data)
-#print job_id
         a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id'])})
         a['status'] = 'waiting'
         hadoopstack.main.mongo.db.job.save(a)
@@ -53,7 +101,8 @@ def jobs_api():
         # @Todo: To associate the cluster id to the job.  
         a['status'] = "completed"
         hadoopstack.main.mongo.db.job.save(a)
-        return jsonify(**job_id)
+#        return jsonify(**job_id)
+        return render_template("list_jobs.html",joblist=job.job_list()['jobs'])
 
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):
