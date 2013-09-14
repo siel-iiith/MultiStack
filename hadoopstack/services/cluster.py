@@ -3,16 +3,20 @@ from boto.ec2.regioninfo import EC2RegionInfo
 
 from hadoopstack import config
 from time import sleep
+from tempfile import mkstemp
+from multiprocessing import Process
 
+import socket
 import hadoopstack
 import simplejson
+import paramiko
+import subprocess
 
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
 from hadoopstack.services.connectToMaster import connectMaster
 from hadoopstack.services.prepareProperties import preparePropertyFile
 from hadoopstack.services.connectToMaster import connectMaster
-
 
 from bson import objectid
 
@@ -66,8 +70,8 @@ def boot_instances(conn,
 def create_keypair(conn, keypair_name):
     
     keypair = conn.create_key_pair(keypair_name)
-    keypair.save("./hadoopstack/services/toTransfer")
-#    hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
+    keypair.save(config.DEFAULT_KEY_LOCATION)
+#   hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
     # TODO - Save this keypair file in the mongodb
 
 def create_security_groups(conn, cluster_name):
@@ -115,6 +119,73 @@ def create_security_groups(conn, cluster_name):
         to_port = -1,
         cidr_ip = "0.0.0.0/0")
 
+def ssh_check(instance_ip, key_location):
+    '''
+    Check if the ssh is up and running
+    '''
+
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    
+    while(True):
+        try:
+            ssh.connect(hostname=instance_ip,
+                        username="ubuntu",
+                        key_filename=key_location)
+        
+        except socket.error, (value, message):
+            if value == 113 or 111:
+                print "checking for ssh..."
+                sleep(1)
+                continue
+            else:
+                print "socket.error: [Errno", value, "]", message
+        
+        break
+
+def configure_cluster(node_ips, num_jt, num_tt, keyname):
+    '''
+    Configure Hadoop on the cluster using Chef
+    '''
+
+    key_location = config.DEFAULT_KEY_LOCATION + "/" + keyname
+
+    if num_jt == 1:
+        jt_role = create_role("jobtracker", node_ips[0], config.NAMENODE_IP)
+        subprocess.Popen("knife role from file {0}".format(jt_role), shell=True)
+    if num_tt > 0:
+        tt_role = create_role("tasktracker", node_ips[0], config.NAMENODE_IP)
+        subprocess.Popen("knife role from file {0}".format(tt_role), shell=True)
+
+    ssh_check(node_ips[0], key_location)
+    subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} --sudo -r 'role[jobtracker]' --no-host-key-verify".format(node_ips[0], key_location)).split())
+    
+    for tt in xrange(0,num_tt):
+        ssh_check(node_ips[tt+1], key_location)
+        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} --sudo -r 'role[tasktracker]' --no-host-key-verify".format(node_ips[tt+1], key_location)).split())
+    
+def create_role(role_name, jobtracker_ip, namenode_ip):
+    '''
+    Create the chef role file.
+    '''
+
+    role_body = []
+    role_body.append('name "{0}"\n'.format(role_name))
+    role_body.append('description  "{0} role"\n'.format(role_name))
+    role_body.append('run_list [\n"recipe[hadoop::default]",\n"recipe[hadoop::{0}]"\n]\n'.format(role_name))
+    attributes = 'override_attributes "hadoop" => {'
+    attributes += '\n"jobtracker" => "{0}",\n"namenode" => "{1}"'.format(jobtracker_ip, namenode_ip)
+    attributes += '\n}\n'
+    role_body.append(attributes)
+
+    role_file = mkstemp(suffix = '.rb')
+    fd = open(role_file[1], 'w')
+    for role_body_str in role_body:
+        fd.write(role_body_str)
+    fd.close()
+
+    return role_file[1]
+
 def spawn(data):
 
     cluster_name = data['cluster']['name']
@@ -147,38 +218,53 @@ def spawn(data):
 
     return conn,listToReturn,keypair_name
 
-def create(data):
+def _create_cluster(data, cluster_id):
 
-    # TODO: We need to create an request check filter before inserting
-
+    # ToDo: Keep updating the status after crucial steps
     conn,reservationId,keypair_name = spawn(data)
     
     reserveId = [ i.id for i in reservationId]
     allVMDetails = getVMid(conn,reserveId)
     
     num_tt = int(data['cluster']['node-recipes']['tasktracker'])
-    num_jt = int(data['cluster']['node-recipes']['jobtracker'])       
+    num_jt = int(data['cluster']['node-recipes']['jobtracker'])
 
     recipeList = []
     [recipeList.append("jobtracker")    for i in xrange(0,num_jt)]
     [recipeList.append("tasktracker")   for i in xrange(0,num_tt)]
     
-    clusterDetails = fetchDict(conn, allVMDetails, recipeList, reserveId)
-    clusterDetails['name'] = data['cluster']['name']
-    hadoopstack.main.mongo.db.cluster.insert(clusterDetails)
-    
-    allIPs,allPrivateIPs=preparePropertyFile(conn,reserveId)
-    allPublicIPs=filter(lambda x: x!="0.0.0.0" , map(lambda x,y:x if x!=y else "0.0.0.0" ,allIPs,allPrivateIPs))
-    connectMaster(allPublicIPs[0],keypair_name) 
-    id_t = str(clusterDetails['_id'])
-    clusterDetails['_id'] = simplejson.dumps(id_t) 
+    cluster_details = fetchDict(conn, allVMDetails, recipeList, reserveId)
+    cluster_details['_id'] = cluster_id
+    cluster_details['name'] = data['cluster']['name']
+    hadoopstack.main.mongo.db.cluster.save(cluster_details)
+
+    keypair_name = "hadoopstack-" + data['cluster']['name'] + ".pem"
+    nodes_ips = []
+    for r in reservationId:
+        for i in r.instances:
+            nodes_ips.append(str(i.private_ip_address))
+
+    configure_cluster(nodes_ips, num_jt, num_tt, keypair_name)
+
+    return
+
+def create(data):
+
+    # TODO: We need to create an request-check/validation filter before inserting
+
+    cluster_details = {}
+    hadoopstack.main.mongo.db.cluster.insert(cluster_details)
+
+    id_t = str(cluster_details['_id'])
     create_ret = {}
     create_ret['cid'] = id_t
+
+    Process(target = _create_cluster, args = (data, cluster_details['_id'])).start()
+    
     return create_ret
 
 def delete(cid):
     cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]
-    print cluster_info
     cluster_name = cluster_info['name']
     conn = make_connection()
 
@@ -243,7 +329,7 @@ def cluster_list():
     clusters_dict = {"clusters": []}
     for i in list(hadoopstack.main.mongo.db.cluster.find()):
         i["_id"] = str(i["_id"])
-        clusters_dict["jobs"].append(i)
+        clusters_dict["clusters"].append(i)
     return clusters_dict
 
 
