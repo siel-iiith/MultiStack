@@ -14,7 +14,6 @@ Dependencies
 ============
 
 ```
-$ pip install flask flask-pymongo simplejson fabric requests
-$ pip install boto==2.12.0
+$ pip install -r requirements.txt
 $ apt-get install mongodb
 ```
