@@ -1,6 +1,6 @@
 import os
 
-def getVMid(conn,currentReservationId="Nil"):
+def getVMid(conn,currentReservationId=None):
     allReservations=conn.get_all_instances()
     
     allInstances=[(str(i.id),str(i.launch_time),str(i.state),str(r.id)) for 
