@@ -14,9 +14,6 @@ import subprocess
 
 from hadoopstack.dbOperations.db import getVMid
 from hadoopstack.dbOperations.makedict import fetchDict
-from hadoopstack.services.connectToMaster import connectMaster
-from hadoopstack.services.prepareProperties import preparePropertyFile
-from hadoopstack.services.connectToMaster import connectMaster
 
 from bson import objectid
 
