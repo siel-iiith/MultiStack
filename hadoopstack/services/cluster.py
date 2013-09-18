@@ -140,48 +140,20 @@ def ssh_check(instance_ip, key_location):
         
         break
 
-def configure_cluster(node_ips, num_jt, num_tt, keyname):
+def configure_cluster(node_ips, num_jt, num_tt, cluster_name):
     '''
     Configure Hadoop on the cluster using Chef
+
     '''
 
-    key_location = config.DEFAULT_KEY_LOCATION + "/" + keyname
-
-    if num_jt == 1:
-        jt_role = create_role("jobtracker", node_ips[0], config.NAMENODE_IP)
-        subprocess.Popen("knife role from file {0}".format(jt_role), shell=True)
-    if num_tt > 0:
-        tt_role = create_role("tasktracker", node_ips[0], config.NAMENODE_IP)
-        subprocess.Popen("knife role from file {0}".format(tt_role), shell=True)
+    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + cluster_name + ".pem"
 
     ssh_check(node_ips[0], key_location)
-    subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} --sudo -r 'role[jobtracker]' --no-host-key-verify".format(node_ips[0], key_location)).split())
+    subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node_ips[0], key_location, cluster_name)).split())
     
     for tt in xrange(0,num_tt):
         ssh_check(node_ips[tt+1], key_location)
-        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} --sudo -r 'role[tasktracker]' --no-host-key-verify".format(node_ips[tt+1], key_location)).split())
-    
-def create_role(role_name, jobtracker_ip, namenode_ip):
-    '''
-    Create the chef role file.
-    '''
-
-    role_body = []
-    role_body.append('name "{0}"\n'.format(role_name))
-    role_body.append('description  "{0} role"\n'.format(role_name))
-    role_body.append('run_list [\n"recipe[hadoop::default]",\n"recipe[hadoop::{0}]"\n]\n'.format(role_name))
-    attributes = 'override_attributes "hadoop" => {'
-    attributes += '\n"jobtracker" => "{0}",\n"namenode" => "{1}"'.format(jobtracker_ip, namenode_ip)
-    attributes += '\n}\n'
-    role_body.append(attributes)
-
-    role_file = mkstemp(suffix = '.rb')
-    fd = open(role_file[1], 'w')
-    for role_body_str in role_body:
-        fd.write(role_body_str)
-    fd.close()
-
-    return role_file[1]
+        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node_ips[tt+1], key_location, cluster_name, str(tt+1))).split())
 
 def spawn(data):
 
@@ -235,13 +207,12 @@ def _create_cluster(data, cluster_id):
     cluster_details['name'] = data['cluster']['name']
     hadoopstack.main.mongo.db.cluster.save(cluster_details)
 
-    keypair_name = "hadoopstack-" + data['cluster']['name'] + ".pem"
     nodes_ips = []
     for r in reservationId:
         for i in r.instances:
             nodes_ips.append(str(i.private_ip_address))
 
-    configure_cluster(nodes_ips, num_jt, num_tt, keypair_name)
+    configure_cluster(nodes_ips, num_jt, num_tt, data['cluster']['name'])
 
     return
 
