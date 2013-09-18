@@ -293,7 +293,7 @@ def delete(cid):
     return ('Deleted Cluster', 200)
 
 
-def cluster_list():
+def list_clusters():
     clusters_dict = {"clusters": []}
     for i in list(hadoopstack.main.mongo.db.cluster.find()):
         i["_id"] = str(i["_id"])

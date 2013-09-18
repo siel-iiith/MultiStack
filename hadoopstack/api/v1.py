@@ -1,5 +1,5 @@
 from flask import Blueprint, Flask, request, session, url_for, redirect, \
-     render_template, abort, g, flash, _app_ctx_stack, jsonify
+     render_template, abort, g, flash, jsonify
 from hadoopstack.services import job
 from hadoopstack.services import cluster
 
@@ -113,7 +113,7 @@ def jobs_api():
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):
 
-    if request.method == "GET":        
+    if request.method == "GET":
         return jsonify(job.info(job_id))
         
     elif request.method == "DELETE":
@@ -125,8 +125,8 @@ def clusters_api():
         Cluster API
     '''
     if request.method == 'GET':
-        print cluster.cluster_list()['clusters']
-        return render_template("list_clusters.html",clusterlist=cluster.cluster_list()['clusters'])
+        return jsonify(**cluster.list_clusters())
+
     if request.method == 'POST':
         data = request.json
         cid = cluster.create(data)
