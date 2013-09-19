@@ -73,44 +73,44 @@ def create_keypair(conn, keypair_name):
 
 def create_security_groups(conn, cluster_name):
 
-    sec_tt_name = "hadoopstack-" + cluster_name + "-tasktracker"
-    sec_jt_name = "hadoopstack-" + cluster_name + "-jobtracker"
-    sec_tt = conn.create_security_group(sec_tt_name, "Security group for the TaskTrackers")
-    sec_jt = conn.create_security_group(sec_jt_name, "Security group for the JobTracker")
+    sec_slave_name = "hadoopstack-" + cluster_name + "-slave"
+    sec_master_name = "hadoopstack-" + cluster_name + "-master"
+    sec_slave = conn.create_security_group(sec_slave_name, "Security group for the slaves")
+    sec_master = conn.create_security_group(sec_master_name, "Security group for the master")
 
     # For now we'll authorize all the connections. We can add
     # granular rules later
-    sec_tt.authorize(
+    sec_slave.authorize(
         ip_protocol = "tcp",
         from_port = 1,
         to_port = 65535,
         cidr_ip = "0.0.0.0/0")
 
-    sec_tt.authorize(
+    sec_slave.authorize(
         ip_protocol = "udp",
         from_port = 1,
         to_port = 65535,
         cidr_ip = "0.0.0.0/0")
 
-    sec_tt.authorize(
+    sec_slave.authorize(
         ip_protocol = "icmp",
         from_port = -1,
         to_port = -1,
         cidr_ip = "0.0.0.0/0")  
 
-    sec_jt.authorize(
+    sec_master.authorize(
         ip_protocol = "tcp",
         from_port = 1,
         to_port = 65535,
         cidr_ip = "0.0.0.0/0")
 
-    sec_jt.authorize(
+    sec_master.authorize(
         ip_protocol = "udp",
         from_port = 1,
         to_port = 65535,
         cidr_ip = "0.0.0.0/0")    
 
-    sec_jt.authorize(
+    sec_master.authorize(
         ip_protocol = "icmp",
         from_port = -1,
         to_port = -1,
@@ -140,7 +140,7 @@ def ssh_check(instance_ip, key_location):
         
         break
 
-def configure_cluster(node_ips, num_jt, num_tt, cluster_name):
+def configure_cluster(node_ips, num_master, num_slave, cluster_name):
     '''
     Configure Hadoop on the cluster using Chef
 
@@ -151,41 +151,43 @@ def configure_cluster(node_ips, num_jt, num_tt, cluster_name):
     ssh_check(node_ips[0], key_location)
     subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node_ips[0], key_location, cluster_name)).split())
     
-    for tt in xrange(0,num_tt):
-        ssh_check(node_ips[tt+1], key_location)
-        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node_ips[tt+1], key_location, cluster_name, str(tt+1))).split())
+    for slave in xrange(0,num_slave):
+        ssh_check(node_ips[slave+1], key_location)
+        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node_ips[slave+1], key_location, cluster_name, str(slave+1))).split())
 
 def spawn(data):
 
     cluster_name = data['cluster']['name']
     keypair_name = "hadoopstack-" + cluster_name
-    sec_tt_name = "hadoopstack-" + cluster_name + "-tasktracker"
-    sec_jt_name = "hadoopstack-" + cluster_name + "-jobtracker"
+    sec_slave_name = "hadoopstack-" + cluster_name + "-slave"
+    sec_master_name = "hadoopstack-" + cluster_name + "-master"
 
     conn = make_connection()
     create_keypair(conn, keypair_name)
     create_security_groups(conn, cluster_name)
-    res_tt = boot_instances(
+    res_slave = boot_instances(
         conn, 
-        data['cluster']['node-recipes']['tasktracker'], 
+        data['cluster']['master']['instances'],
         keypair_name,
-        [sec_tt_name]
+        [sec_slave_name],
+        flavor = data['cluster']['master']['flavor']
         )
 
-    res_jt = boot_instances(
+    res_master = boot_instances(
         conn, 
-        data['cluster']['node-recipes']['jobtracker'], 
+        data['cluster']['slave']['instances'],
         keypair_name,
-        [sec_jt_name]
+        [sec_master_name],
+        flavor = data['cluster']['slave']['flavor']
         )
 
-    listToReturn = []
-    listToReturn.append(res_jt)
-    listToReturn.append(res_tt)
+    res_list = []
+    res_list.append(res_master)
+    res_list.append(res_slave)
 
-    associate_public_ip(conn, res_jt.instances[0].id)
+    associate_public_ip(conn, res_master.instances[0].id)
 
-    return conn,listToReturn,keypair_name
+    return conn,res_list,keypair_name
 
 def _create_cluster(data, cluster_id):
 
@@ -195,12 +197,12 @@ def _create_cluster(data, cluster_id):
     reserveId = [ i.id for i in reservationId]
     allVMDetails = getVMid(conn,reserveId)
     
-    num_tt = int(data['cluster']['node-recipes']['tasktracker'])
-    num_jt = int(data['cluster']['node-recipes']['jobtracker'])
+    num_slave = int(data['cluster']['master']['instances'])
+    num_master = int(data['cluster']['slave']['instances'])
 
     recipeList = []
-    [recipeList.append("jobtracker")    for i in xrange(0,num_jt)]
-    [recipeList.append("tasktracker")   for i in xrange(0,num_tt)]
+    [recipeList.append("master")    for i in xrange(0,num_master)]
+    [recipeList.append("slave")   for i in xrange(0,num_slave)]
     
     cluster_details = fetchDict(conn, allVMDetails, recipeList, reserveId)
     cluster_details['_id'] = cluster_id
@@ -212,7 +214,7 @@ def _create_cluster(data, cluster_id):
         for i in r.instances:
             nodes_ips.append(str(i.private_ip_address))
 
-    configure_cluster(nodes_ips, num_jt, num_tt, data['cluster']['name'])
+    configure_cluster(nodes_ips, num_master, num_slave, data['cluster']['name'])
 
     return
 
@@ -237,8 +239,8 @@ def delete(cid):
     conn = make_connection()
 
     keypair = 'hadoopstack-' + cluster_name
-    security_groups = ['hadoopstack-' + cluster_name + '-jobtracker', 
-                'hadoopstack-' + cluster_name + '-tasktracker']
+    security_groups = ['hadoopstack-' + cluster_name + '-master', 
+        'hadoopstack-' + cluster_name + '-slave']
 
 
     '''
