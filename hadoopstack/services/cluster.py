@@ -234,7 +234,7 @@ def create(data):
     return create_ret
 
 def delete(cid):
-    cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]
+    cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]['cluster']
     cluster_name = cluster_info['name']
     conn = make_connection()
 
@@ -257,8 +257,8 @@ def delete(cid):
         flag = False
         for res in conn.get_all_instances():
             for instance in res.instances:
-                for vm in cluster_info['VMids']:
-                    if instance.id == str(vm['id']):
+                for node in cluster_info['nodes']:
+                    if instance.id == str(node['id']):
                         try:
                             if instance.ip_address != instance.private_ip_address:
                                 if instance.ip_address not in public_ips:
