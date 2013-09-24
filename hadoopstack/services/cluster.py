@@ -12,8 +12,9 @@ import simplejson
 import paramiko
 import subprocess
 
-from hadoopstack.dbOperations.db import getVMid
-from hadoopstack.dbOperations.makedict import fetchDict
+from hadoopstack.dbOperations.db import get_node_objects
+from hadoopstack.dbOperations.db import flush_data_to_mongo
+from hadoopstack.dbOperations.db import update_private_ip_address
 
 from bson import objectid
 
@@ -140,81 +141,77 @@ def ssh_check(instance_ip, key_location):
         
         break
 
-def configure_cluster(node_ips, num_master, num_slave, cluster_name):
+def configure_cluster(data):
     '''
     Configure Hadoop on the cluster using Chef
 
     '''
 
-    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + cluster_name + ".pem"
+    cluster_name = data['cluster']['name']
 
-    ssh_check(node_ips[0], key_location)
-    subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node_ips[0], key_location, cluster_name)).split())
-    
-    for slave in xrange(0,num_slave):
-        ssh_check(node_ips[slave+1], key_location)
-        subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node_ips[slave+1], key_location, cluster_name, str(slave+1))).split())
+    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + cluster_name + ".pem"
+    slave_count = 1
+
+    for node in data['cluster']['nodes']:
+        ssh_check(node['private_ip_address'], key_location)
+        if node['role'] == 'master':
+            subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name)).split())
+        elif node['role'] == 'slave':
+            subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name, str(slave_count))).split())
+            slave_count += 1
 
 def spawn(data):
 
+    data['cluster']['status'] = 'spawning'
+    flush_data_to_mongo('cluster', data)
+
     cluster_name = data['cluster']['name']
     keypair_name = "hadoopstack-" + cluster_name
-    sec_slave_name = "hadoopstack-" + cluster_name + "-slave"
-    sec_master_name = "hadoopstack-" + cluster_name + "-master"
+    sec_slave = "hadoopstack-" + cluster_name + "-slave"
+    sec_master = "hadoopstack-" + cluster_name + "-master"
 
     conn = make_connection()
     create_keypair(conn, keypair_name)
     create_security_groups(conn, cluster_name)
-    res_slave = boot_instances(
-        conn, 
-        data['cluster']['master']['instances'],
-        keypair_name,
-        [sec_slave_name],
-        flavor = data['cluster']['master']['flavor']
-        )
+
+    data['cluster']['nodes'] = []
+
+    master = data['cluster']['master']
 
     res_master = boot_instances(
-        conn, 
-        data['cluster']['slave']['instances'],
+        conn,
+        1,
         keypair_name,
-        [sec_master_name],
-        flavor = data['cluster']['slave']['flavor']
+        [sec_master],
+        flavor = master['flavor']
         )
-
-    res_list = []
-    res_list.append(res_master)
-    res_list.append(res_slave)
+    data['cluster']['nodes'] += get_node_objects(conn, "master", res_master.id)
+    flush_data_to_mongo('cluster', data)
 
     associate_public_ip(conn, res_master.instances[0].id)
 
-    return conn,res_list,keypair_name
+    for slave in data['cluster']['slaves']:
+        res_slave = boot_instances(
+            conn,
+            slave['instances'],
+            keypair_name,
+            [sec_slave],
+            flavor = slave['flavor']
+            )
+        data['cluster']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
+        flush_data_to_mongo('cluster', data)
+
+    update_private_ip_address(conn, data)
+
+    return
 
 def _create_cluster(data, cluster_id):
 
     # ToDo: Keep updating the status after crucial steps
-    conn,reservationId,keypair_name = spawn(data)
-    
-    reserveId = [ i.id for i in reservationId]
-    allVMDetails = getVMid(conn,reserveId)
-    
-    num_slave = int(data['cluster']['master']['instances'])
-    num_master = int(data['cluster']['slave']['instances'])
+    spawn(data)
+    print "done done done"
 
-    recipeList = []
-    [recipeList.append("master")    for i in xrange(0,num_master)]
-    [recipeList.append("slave")   for i in xrange(0,num_slave)]
-    
-    cluster_details = fetchDict(conn, allVMDetails, recipeList, reserveId)
-    cluster_details['_id'] = cluster_id
-    cluster_details['name'] = data['cluster']['name']
-    hadoopstack.main.mongo.db.cluster.save(cluster_details)
-
-    nodes_ips = []
-    for r in reservationId:
-        for i in r.instances:
-            nodes_ips.append(str(i.private_ip_address))
-
-    configure_cluster(nodes_ips, num_master, num_slave, data['cluster']['name'])
+    configure_cluster(data)
 
     return
 
@@ -222,10 +219,13 @@ def create(data):
 
     # TODO: We need to create an request-check/validation filter before inserting
 
-    cluster_details = {}
+    cluster_details = data
     hadoopstack.main.mongo.db.cluster.insert(cluster_details)
 
     id_t = str(cluster_details['_id'])
+    data['cluster']['id'] = id_t
+    flush_data_to_mongo('cluster', data)
+
     create_ret = {}
     create_ret['cid'] = id_t
 
@@ -241,7 +241,6 @@ def delete(cid):
     keypair = 'hadoopstack-' + cluster_name
     security_groups = ['hadoopstack-' + cluster_name + '-master', 
         'hadoopstack-' + cluster_name + '-slave']
-
 
     '''
     
@@ -298,8 +297,7 @@ def delete(cid):
 def list_clusters():
     clusters_dict = {"clusters": []}
     for i in list(hadoopstack.main.mongo.db.cluster.find()):
-        i["_id"] = str(i["_id"])
-        clusters_dict["clusters"].append(i)
+        clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
 
 
