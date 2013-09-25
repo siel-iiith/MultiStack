@@ -138,8 +138,12 @@ def ssh_check(instance_ip, key_location):
                 continue
             else:
                 print "socket.error: [Errno", value, "]", message
+
+        except paramiko.SSHException:
+            print "paramiko.error: connection refused. Discarding instance"
+            return False
         
-        break
+        return True
 
 def configure_cluster(data):
     '''
@@ -153,9 +157,16 @@ def configure_cluster(data):
     slave_count = 1
 
     for node in data['cluster']['nodes']:
-        ssh_check(node['private_ip_address'], key_location)
+        if not ssh_check(node['private_ip_address'], key_location):
+            if node['role'] == 'master':
+                print "Unable to ssh into master. Aborting!!!"
+                return
+            print "Unable to ssh into node {0}. Skipping it".format(node['private_ip_address'])
+            continue
+
         if node['role'] == 'master':
             subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name)).split())
+
         elif node['role'] == 'slave':
             subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name, str(slave_count))).split())
             slave_count += 1
