@@ -155,7 +155,7 @@ def configure_cluster(data):
     for node in data['cluster']['nodes']:
         ssh_check(node['private_ip_address'], key_location)
         if node['role'] == 'master':
-            subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name)).split())
+            subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name)).split())
         elif node['role'] == 'slave':
             subprocess.Popen(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name, str(slave_count))).split())
             slave_count += 1
