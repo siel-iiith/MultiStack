@@ -10,6 +10,23 @@ from bson import objectid
 
 def create(data):
 
+    flavor = ["m1.tiny", "m1.small", "m1.medium", "m1.large", "m1.xlarge"]
+
+    # Validation
+    name = hadoopstack.main.mongo.db.job.find_one({"name": data["jobs"]["name"]})
+    if name != None:
+        return 0
+    if "s3://" not in data["jobs"]["input"]:
+        if "swift://" not in data["jobs"]["input"]:
+            return 0
+    if "s3://" not in data["jobs"]["output"]: 
+        if "swift://" not in data["jobs"]["output"]:
+            return 0
+    if data["jobs"]["master"]["flavor"] not in flavor:
+        return 0
+    if data["jobs"]["slave"]["flavor"] not in flavor:
+        return 0
+
     jobDetails = jobDict(data)
     hadoopstack.main.mongo.db.job.insert(jobDetails)
     id_t = str(jobDetails['_id'])

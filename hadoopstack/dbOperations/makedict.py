@@ -10,7 +10,7 @@ def jobDict(data):
     
     # Hardcoded, as we havnt made the user based form to submit a job
     jobDetails['user'] = "Stark"
-    jobDetails['description'] = data['jobs']['description']
+    jobDetails['description'] = "No Description"
     jobDetails['assigned_to_cluster'] = "NA"
     # When the job is submitted. Lets save epoch for the time being.
     jobDetails['submission_time'] = datetime.datetime.utcnow().isoformat()
