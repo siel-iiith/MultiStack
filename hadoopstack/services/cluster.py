@@ -20,18 +20,28 @@ from bson import objectid
 
 def make_connection():
     url = config.EC2_URL
+    url_path = str()
+
     url_endpoint = url.split('/')[2]
-    url_port = url.split(':')[2].split('/')[0]
-    url_path = url.split(url_port)[1]    
+    url_protocol = url.split('/')[0]
+    if url_protocol == "https:":
+        secure = True
+    elif url_protocol == "http:":
+        secure = False
+
+    if len(url.split(':')) > 2:
+        url_port = url.split(':')[2].split('/')[0]
+        url_path = url.split(url_port)[1]
     
-    hs_region = EC2RegionInfo(name = "siel", endpoint = url_endpoint)
+    hs_region = EC2RegionInfo(name = config.EC2_REGION, endpoint = url_endpoint)
 
     conn=EC2Connection(
                     aws_access_key_id = config.EC2_ACCESS_KEY,
                     aws_secret_access_key = config.EC2_SECRET_KEY,
                     is_secure = False,
                     path = url_path,
-                    region = hs_region)
+                    region = hs_region
+                    )
     return conn
 
 def associate_public_ip(conn, instance_id):
@@ -220,7 +230,6 @@ def _create_cluster(data, cluster_id):
 
     # ToDo: Keep updating the status after crucial steps
     spawn(data)
-    print "done done done"
 
     configure_cluster(data)
 
