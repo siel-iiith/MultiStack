@@ -183,6 +183,7 @@ def configure_cluster(data):
 
 def spawn(data):
 
+    data['cluster']['nodes'] = []
     data['cluster']['status'] = 'spawning'
     flush_data_to_mongo('cluster', data)
 
@@ -194,8 +195,6 @@ def spawn(data):
     conn = make_connection()
     create_keypair(conn, keypair_name)
     create_security_groups(conn, cluster_name)
-
-    data['cluster']['nodes'] = []
 
     master = data['cluster']['master']
 
