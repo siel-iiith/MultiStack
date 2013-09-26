@@ -156,6 +156,18 @@ def ssh_check(instance_ip, key_location):
         
         return True
 
+def _configure_master(private_ip_address, key_location, cluster_name):
+    subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
+        -N {2}-master --sudo -r 'recipe[hadoopstack::master]' \
+        --no-host-key-verify".format(private_ip_address,
+         key_location, cluster_name)).split())
+
+def _configure_slave(private_ip_address, key_location, cluster_name, count):
+    subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
+        -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' \
+        --no-host-key-verify".format(private_ip_address,
+         key_location, cluster_name, count)).split())
+
 def configure_cluster(data):
     '''
     Configure Hadoop on the cluster using Chef
@@ -176,10 +188,10 @@ def configure_cluster(data):
             continue
 
         if node['role'] == 'master':
-            subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-master --sudo -r 'recipe[hadoopstack::master]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name)).split())
+            _configure_master(node['private_ip_address'], key_location, cluster_name)
 
         elif node['role'] == 'slave':
-            subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' --no-host-key-verify".format(node['private_ip_address'], key_location, cluster_name, str(slave_count))).split())
+            _configure_slave(node['private_ip_address'], key_location, cluster_name, slave_count)
             slave_count += 1
 
 def spawn(data):
