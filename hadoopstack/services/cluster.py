@@ -44,6 +44,13 @@ def make_connection():
                     )
     return conn
 
+def ec2_entities(cluster_name):
+
+    keypair_name = "hadoopstack-" + cluster_name
+    sec_slave = "hadoopstack-" + cluster_name + "-slave"
+    sec_master = "hadoopstack-" + cluster_name + "-master"
+    return keypair_name, sec_master, sec_slave
+
 def associate_public_ip(conn, instance_id):
     for addr in conn.get_all_addresses():
         if addr.instance_id is '':
@@ -83,10 +90,8 @@ def create_keypair(conn, keypair_name):
 #   hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
     # TODO - Save this keypair file in the mongodb
 
-def create_security_groups(conn, cluster_name):
+def create_security_groups(conn, sec_master_name, sec_slave_name):
 
-    sec_slave_name = "hadoopstack-" + cluster_name + "-slave"
-    sec_master_name = "hadoopstack-" + cluster_name + "-master"
     sec_slave = conn.create_security_group(sec_slave_name, "Security group for the slaves")
     sec_master = conn.create_security_group(sec_master_name, "Security group for the master")
 
@@ -201,13 +206,11 @@ def spawn(data):
     flush_data_to_mongo('cluster', data)
 
     cluster_name = data['cluster']['name']
-    keypair_name = "hadoopstack-" + cluster_name
-    sec_slave = "hadoopstack-" + cluster_name + "-slave"
-    sec_master = "hadoopstack-" + cluster_name + "-master"
+    keypair_name, sec_master, sec_slave = ec2_entities(cluster_name)
 
     conn = make_connection()
     create_keypair(conn, keypair_name)
-    create_security_groups(conn, cluster_name)
+    create_security_groups(conn, sec_master, sec_slave)
 
     master = data['cluster']['master']
 
@@ -331,5 +334,3 @@ def list_clusters():
     for i in list(hadoopstack.main.mongo.db.cluster.find()):
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
-
-
