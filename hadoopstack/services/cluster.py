@@ -1,203 +1,18 @@
-from boto.ec2.connection import EC2Connection
-from boto.ec2.regioninfo import EC2RegionInfo
-
 from hadoopstack import config
-from time import sleep
-from tempfile import mkstemp
 from multiprocessing import Process
 
-import socket
 import hadoopstack
 import simplejson
-import paramiko
 import subprocess
 
 from hadoopstack.dbOperations.db import get_node_objects
 from hadoopstack.dbOperations.db import flush_data_to_mongo
 from hadoopstack.dbOperations.db import update_private_ip_address
 
+from hadoopstack.services.configuration import configure_cluster
+from hadoopstack.services import ec2
+
 from bson import objectid
-
-def make_connection():
-    url = config.EC2_URL
-    url_path = str()
-
-    url_endpoint = url.split('/')[2]
-    url_protocol = url.split('/')[0].split(':')[0]
-    if url_protocol == "https":
-        secure = True
-    elif url_protocol == "http":
-        secure = False
-
-    if len(url.split(':')) > 2:
-        url_port = url.split(':')[2].split('/')[0]
-        url_path = url.split(url_port)[1]
-    
-    hs_region = EC2RegionInfo(name = config.EC2_REGION, endpoint = url_endpoint)
-
-    conn=EC2Connection(
-                    aws_access_key_id = config.EC2_ACCESS_KEY,
-                    aws_secret_access_key = config.EC2_SECRET_KEY,
-                    is_secure = secure,
-                    path = url_path,
-                    region = hs_region
-                    )
-    return conn
-
-def ec2_entities(cluster_name):
-
-    keypair_name = "hadoopstack-" + cluster_name
-    sec_slave = "hadoopstack-" + cluster_name + "-slave"
-    sec_master = "hadoopstack-" + cluster_name + "-master"
-    return keypair_name, sec_master, sec_slave
-
-def associate_public_ip(conn, instance_id):
-    for addr in conn.get_all_addresses():
-        if addr.instance_id is '':
-            addr.associate(instance_id)
-            return
-
-    addr = conn.allocate_address()
-    addr.associate(instance_id)
-    print "IP Associated:", addr.public_ip
-
-def release_public_ips(conn, public_ips_list):
-    for addr in conn.get_all_addresses():
-        if (addr.public_ip in public_ips_list) and addr.instance_id is None:
-            addr.release()
-
-def boot_instances(conn, 
-                    number, 
-                    keypair,
-                    security_groups,
-                    flavor,
-                    image_id = config.DEFAULT_IMAGE_ID
-                    ):
-    
-    connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
-    
-    while connx.instances[0].state == "pending":
-        for res in conn.get_all_instances():
-            if res.id == connx.id:
-                connx = res
-        sleep(1)
-    return connx
-
-def create_keypair(conn, keypair_name):
-    
-    keypair = conn.create_key_pair(keypair_name)
-    keypair.save(config.DEFAULT_KEY_LOCATION)
-#   hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
-    # TODO - Save this keypair file in the mongodb
-
-def create_security_groups(conn, sec_master_name, sec_slave_name):
-
-    sec_slave = conn.create_security_group(sec_slave_name, "Security group for the slaves")
-    sec_master = conn.create_security_group(sec_master_name, "Security group for the master")
-
-    # For now we'll authorize all the connections. We can add
-    # granular rules later
-    sec_slave.authorize(
-        ip_protocol = "tcp",
-        from_port = 1,
-        to_port = 65535,
-        cidr_ip = "0.0.0.0/0")
-
-    sec_slave.authorize(
-        ip_protocol = "udp",
-        from_port = 1,
-        to_port = 65535,
-        cidr_ip = "0.0.0.0/0")
-
-    sec_slave.authorize(
-        ip_protocol = "icmp",
-        from_port = -1,
-        to_port = -1,
-        cidr_ip = "0.0.0.0/0")  
-
-    sec_master.authorize(
-        ip_protocol = "tcp",
-        from_port = 1,
-        to_port = 65535,
-        cidr_ip = "0.0.0.0/0")
-
-    sec_master.authorize(
-        ip_protocol = "udp",
-        from_port = 1,
-        to_port = 65535,
-        cidr_ip = "0.0.0.0/0")    
-
-    sec_master.authorize(
-        ip_protocol = "icmp",
-        from_port = -1,
-        to_port = -1,
-        cidr_ip = "0.0.0.0/0")
-
-def ssh_check(instance_ip, key_location):
-    '''
-    Check if the ssh is up and running
-    '''
-
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
-    while(True):
-        try:
-            ssh.connect(hostname=instance_ip,
-                        username="ubuntu",
-                        key_filename=key_location)
-        
-        except socket.error, (value, message):
-            if value == 113 or 111:
-                print "checking for ssh..."
-                sleep(1)
-                continue
-            else:
-                print "socket.error: [Errno", value, "]", message
-
-        except paramiko.SSHException:
-            print "paramiko.error: connection refused. Discarding instance"
-            return False
-        
-        return True
-
-def _configure_master(private_ip_address, key_location, cluster_name):
-    subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
-        -N {2}-master --sudo -r 'recipe[hadoopstack::master]' \
-        --no-host-key-verify".format(private_ip_address,
-         key_location, cluster_name)).split())
-
-def _configure_slave(private_ip_address, key_location, cluster_name, count):
-    subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
-        -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' \
-        --no-host-key-verify".format(private_ip_address,
-         key_location, cluster_name, count)).split())
-
-def configure_cluster(data):
-    '''
-    Configure Hadoop on the cluster using Chef
-
-    '''
-
-    cluster_name = data['cluster']['name']
-
-    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + cluster_name + ".pem"
-    slave_count = 1
-
-    for node in data['cluster']['nodes']:
-        if not ssh_check(node['private_ip_address'], key_location):
-            if node['role'] == 'master':
-                print "Unable to ssh into master. Aborting!!!"
-                return
-            print "Unable to ssh into node {0}. Skipping it".format(node['private_ip_address'])
-            continue
-
-        if node['role'] == 'master':
-            _configure_master(node['private_ip_address'], key_location, cluster_name)
-
-        elif node['role'] == 'slave':
-            _configure_slave(node['private_ip_address'], key_location, cluster_name, slave_count)
-            slave_count += 1
 
 def spawn(data):
 
@@ -206,15 +21,15 @@ def spawn(data):
     flush_data_to_mongo('cluster', data)
 
     cluster_name = data['cluster']['name']
-    keypair_name, sec_master, sec_slave = ec2_entities(cluster_name)
+    keypair_name, sec_master, sec_slave = ec2.ec2_entities(cluster_name)
 
-    conn = make_connection()
-    create_keypair(conn, keypair_name)
-    create_security_groups(conn, sec_master, sec_slave)
+    conn = ec2.make_connection()
+    ec2.create_keypair(conn, keypair_name)
+    ec2.create_security_groups(conn, sec_master, sec_slave)
 
     master = data['cluster']['master']
 
-    res_master = boot_instances(
+    res_master = ec2.boot_instances(
         conn,
         1,
         keypair_name,
@@ -224,10 +39,10 @@ def spawn(data):
     data['cluster']['nodes'] += get_node_objects(conn, "master", res_master.id)
     flush_data_to_mongo('cluster', data)
 
-    associate_public_ip(conn, res_master.instances[0].id)
+    ec2.associate_public_ip(conn, res_master.instances[0].id)
 
     for slave in data['cluster']['slaves']:
-        res_slave = boot_instances(
+        res_slave = ec2.boot_instances(
             conn,
             slave['instances'],
             keypair_name,
@@ -271,7 +86,7 @@ def create(data):
 def delete(cid):
     cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]['cluster']
     cluster_name = cluster_info['name']
-    conn = make_connection()
+    conn = ec2.make_connection()
 
     keypair = 'hadoopstack-' + cluster_name
     security_groups = ['hadoopstack-' + cluster_name + '-master', 
@@ -324,7 +139,7 @@ def delete(cid):
     except:
         print "Error while deleting Security Groups"
 
-    release_public_ips(conn, public_ips)
+    ec2.release_public_ips(conn, public_ips)
 
     return ('Deleted Cluster', 200)
 
