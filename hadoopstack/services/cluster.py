@@ -23,10 +23,10 @@ def make_connection():
     url_path = str()
 
     url_endpoint = url.split('/')[2]
-    url_protocol = url.split('/')[0]
-    if url_protocol == "https:":
+    url_protocol = url.split('/')[0].split(':')[0]
+    if url_protocol == "https":
         secure = True
-    elif url_protocol == "http:":
+    elif url_protocol == "http":
         secure = False
 
     if len(url.split(':')) > 2:
@@ -38,7 +38,7 @@ def make_connection():
     conn=EC2Connection(
                     aws_access_key_id = config.EC2_ACCESS_KEY,
                     aws_secret_access_key = config.EC2_SECRET_KEY,
-                    is_secure = False,
+                    is_secure = secure,
                     path = url_path,
                     region = hs_region
                     )
@@ -63,8 +63,9 @@ def boot_instances(conn,
                     number, 
                     keypair,
                     security_groups,
-                    image_id = config.DEFAULT_IMAGE_ID, 
-                    flavor = config.DEFAULT_FLAVOR):
+                    flavor,
+                    image_id = config.DEFAULT_IMAGE_ID
+                    ):
     
     connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
     
