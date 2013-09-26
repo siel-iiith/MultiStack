@@ -30,20 +30,13 @@ def jobs_api():
     elif request.method == 'POST':
         data = request.json
         job_id = job.create(data)
+
+        if job_id == 0:
+            return "Error: Invalid input"
         a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id'])})
         a['status'] = 'waiting'
         hadoopstack.main.mongo.db.job.save(a)
-        # Calling the Scheduler
-        job.Scheduler(job_id)
-        # @Todo: To work with threads/ to multiple request to enable this: 
-#       payload = {'cluster':{'name':str(int(random.random()*10000)), 'node-recipes': {'tasktracker':2,'jobtracker':1},'image-id':'ubuntu-12.04-amd64.img'}} 
-#       headers = {'content-type': 'application/json', 'accept': 'application/json'}
-
-#       r = requests.post("http://127.0.0.1:5000/v1/clusters", data=json.dumps(payload), headers=headers)
         
-        # @Todo: To associate the cluster id to the job.  
-        a['status'] = "completed"
-        hadoopstack.main.mongo.db.job.save(a)
         return jsonify(**job_id)
 
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
