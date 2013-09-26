@@ -30,11 +30,11 @@ def make_connection():
                     )
     return conn
 
-def ec2_entities(cluster_name):
+def ec2_entities(job_name):
 
-    keypair_name = "hadoopstack-" + cluster_name
-    sec_slave = "hadoopstack-" + cluster_name + "-slave"
-    sec_master = "hadoopstack-" + cluster_name + "-master"
+    keypair_name = "hadoopstack-" + job_name
+    sec_slave = "hadoopstack-" + job_name + "-slave"
+    sec_master = "hadoopstack-" + job_name + "-master"
     return keypair_name, sec_master, sec_slave
 
 def associate_public_ip(conn, instance_id):

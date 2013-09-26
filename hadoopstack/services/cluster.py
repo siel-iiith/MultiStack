@@ -1,10 +1,8 @@
 from hadoopstack import config
-from multiprocessing import Process
 
 import hadoopstack
 import simplejson
-import subprocess
-
+    
 from hadoopstack.dbOperations.db import get_node_objects
 from hadoopstack.dbOperations.db import flush_data_to_mongo
 from hadoopstack.dbOperations.db import update_private_ip_address
@@ -16,18 +14,18 @@ from bson import objectid
 
 def spawn(data):
 
-    data['cluster']['nodes'] = []
-    data['cluster']['status'] = 'spawning'
-    flush_data_to_mongo('cluster', data)
+    data['job']['nodes'] = []
+    data['job']['status'] = 'spawning'
+    flush_data_to_mongo('job', data)
 
-    cluster_name = data['cluster']['name']
-    keypair_name, sec_master, sec_slave = ec2.ec2_entities(cluster_name)
+    job_name = data['job']['name']
+    keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
 
     conn = ec2.make_connection()
     ec2.create_keypair(conn, keypair_name)
     ec2.create_security_groups(conn, sec_master, sec_slave)
 
-    master = data['cluster']['master']
+    master = data['job']['master']
 
     res_master = ec2.boot_instances(
         conn,
@@ -36,12 +34,12 @@ def spawn(data):
         [sec_master],
         flavor = master['flavor']
         )
-    data['cluster']['nodes'] += get_node_objects(conn, "master", res_master.id)
-    flush_data_to_mongo('cluster', data)
+    data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
+    flush_data_to_mongo('job', data)
 
     ec2.associate_public_ip(conn, res_master.instances[0].id)
 
-    for slave in data['cluster']['slaves']:
+    for slave in data['job']['slaves']:
         res_slave = ec2.boot_instances(
             conn,
             slave['instances'],
@@ -49,19 +47,10 @@ def spawn(data):
             [sec_slave],
             flavor = slave['flavor']
             )
-        data['cluster']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
-        flush_data_to_mongo('cluster', data)
+        data['job']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
+        flush_data_to_mongo('job', data)
 
     update_private_ip_address(conn, data)
-
-    return
-
-def _create_cluster(data, cluster_id):
-
-    # ToDo: Keep updating the status after crucial steps
-    spawn(data)
-
-    configure_cluster(data)
 
     return
 
@@ -69,28 +58,20 @@ def create(data):
 
     # TODO: We need to create an request-check/validation filter before inserting
 
-    cluster_details = data
-    hadoopstack.main.mongo.db.cluster.insert(cluster_details)
+    spawn(data)
 
-    id_t = str(cluster_details['_id'])
-    data['cluster']['id'] = id_t
-    flush_data_to_mongo('cluster', data)
-
-    create_ret = {}
-    create_ret['cid'] = id_t
-
-    Process(target = _create_cluster, args = (data, cluster_details['_id'])).start()
+    configure_cluster(data)
     
-    return create_ret
+    return
 
 def delete(cid):
-    cluster_info = hadoopstack.main.mongo.db.cluster.find({"_id": objectid.ObjectId(cid)})[0]['cluster']
-    cluster_name = cluster_info['name']
+    job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
+    job_name = job_info['name']
     conn = ec2.make_connection()
 
-    keypair = 'hadoopstack-' + cluster_name
-    security_groups = ['hadoopstack-' + cluster_name + '-master', 
-        'hadoopstack-' + cluster_name + '-slave']
+    keypair = 'hadoopstack-' + job_name
+    security_groups = ['hadoopstack-' + job_name + '-master', 
+        'hadoopstack-' + job_name + '-slave']
 
     '''
     
@@ -107,7 +88,7 @@ def delete(cid):
         flag = False
         for res in conn.get_all_instances():
             for instance in res.instances:
-                for node in cluster_info['nodes']:
+                for node in job_info['nodes']:
                     if instance.id == str(node['id']):
                         try:
                             if instance.ip_address != instance.private_ip_address:
@@ -141,11 +122,11 @@ def delete(cid):
 
     ec2.release_public_ips(conn, public_ips)
 
-    return ('Deleted Cluster', 200)
+    return ('Terminated Job', 200)
 
 
 def list_clusters():
     clusters_dict = {"clusters": []}
-    for i in list(hadoopstack.main.mongo.db.cluster.find()):
+    for i in list(hadoopstack.main.mongo.db.job.find()):
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict

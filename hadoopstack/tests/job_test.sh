@@ -16,7 +16,7 @@ create()
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "{\"jobs\":{\"name\":\"$RANDOM\",\"jar\":\"file_mapped.jar\",\"deadline\":\"16/06/2013\",\"input\":\"Swift/S3\",\"output\":\"Swift/S3\",\"master\": {\"flavor\":\"m1.medium\",\"instances\":1},\"slave\": {\"flavor\":\"m1.large\",\"instances\":2} }}" \
+    --data "{\"job\":{\"name\":\"$RANDOM\",\"jar\":\"file_mapped.jar\",\"deadline\":\"16/06/2013\",\"input\":\"s3://\",\"output\":\"s3://\",\"master\": {\"flavor\":\"m1.small\"},\"slaves\": [{\"flavor\":\"m1.small\",\"instances\":1}, {\"flavor\":\"m1.large\",\"instances\":1}]}}" \
     http://localhost:5000/v1/jobs
 
 }

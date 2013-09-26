@@ -33,9 +33,6 @@ def jobs_api():
 
         if job_id == 0:
             return "Error: Invalid input"
-        a = hadoopstack.main.mongo.db.job.find_one({'_id': objectid.ObjectId(job_id['job_id'])})
-        a['status'] = 'waiting'
-        hadoopstack.main.mongo.db.job.save(a)
         
         return jsonify(**job_id)
 
@@ -48,7 +45,7 @@ def job_api(job_id):
     elif request.method == "DELETE":
         return job.delete(job_id)
 
-@app_v1.route('/clusters', methods = ['GET','POST'])
+@app_v1.route('/clusters', methods = ['GET','POST','PUT'])
 def clusters_api():
     '''
         Cluster API
@@ -61,7 +58,20 @@ def clusters_api():
         cid = cluster.create(data)
         return jsonify(**cid)
 
+    if request.method == 'PUT':
+        data = request.json
+
     return "To Be Implemented"
+
+@app_v1.route('/clusters/<cluster_id>/add', methods = ['POST'])
+def add(cluster_id):
+    '''
+    API to add noe to a cluster
+    '''
+
+    data = request.json
+    cluster.add_node(data, cluster_id)
+    return
 
 @app_v1.route('/clusters/<cluster_id>', methods = ['GET','DELETE'])
 def cluster_api(cluster_id):

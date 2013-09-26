@@ -19,7 +19,7 @@ def get_resv_obj(conn, resv_id):
 
 def update_private_ip_address(conn, data):
 
-	for node in data['cluster']['nodes']:
+	for node in data['job']['nodes']:
 		if node['private_ip_address'] is None:
 			node_resv_obj = get_resv_obj(conn, node['reservation_id'])
 			while node_resv_obj.private_ip_address is None:
@@ -28,7 +28,7 @@ def update_private_ip_address(conn, data):
 				get_resv_obj(conn, node_resv_obj)
 
 			node[private_ip_address] = node_resv_obj.private_ip_address
-			flush_data_to_mongo('cluster', data)
+			flush_data_to_mongo('job', data)
 
 def get_node_objects(conn, role, resv_id=None):
 
@@ -47,8 +47,8 @@ def get_node_objects(conn, role, resv_id=None):
 
 def flush_data_to_mongo(db_name, data_dict):
 
-	if db_name == "cluster":
-		hadoopstack.main.mongo.db.cluster.save(data_dict)
+	if db_name == "job":
+		hadoopstack.main.mongo.db.job.save(data_dict)
 
 	if db_name == "job":
 		hadoopstack.main.mongo.db.job.save(data_dict)

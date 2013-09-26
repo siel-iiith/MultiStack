@@ -1,54 +1,65 @@
 from hadoopstack import config
 from time import sleep
+from multiprocessing import Process
 
 import hadoopstack
 import simplejson
 
-from hadoopstack.dbOperations.makedict import jobDict
-
+from hadoopstack.dbOperations.db import flush_data_to_mongo
+import hadoopstack.services.cluster as cluster
 from bson import objectid
 
 def create(data):
 
-    flavor = ["m1.tiny", "m1.small", "m1.medium", "m1.large", "m1.xlarge"]
+    flavor = ['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
 
     # Validation
-    name = hadoopstack.main.mongo.db.job.find_one({"name": data["jobs"]["name"]})
+    name = hadoopstack.main.mongo.db.job.find_one({'name': data['job']['name']})
+
     if name != None:
         return 0
-    if "s3://" not in data["jobs"]["input"]:
-        if "swift://" not in data["jobs"]["input"]:
+    if 's3://' not in data['job']['input']:
+        if 'swift://' not in data['job']['input']:
             return 0
-    if "s3://" not in data["jobs"]["output"]: 
-        if "swift://" not in data["jobs"]["output"]:
+    if 's3://' not in data['job']['output']: 
+        if 'swift://' not in data['job']['output']:
             return 0
-    if data["jobs"]["master"]["flavor"] not in flavor:
+    if data['job']['master']['flavor'] not in flavor:
         return 0
-    if data["jobs"]["slave"]["flavor"] not in flavor:
-        return 0
+    for slave in data['job']['slaves']:
+        if slave['flavor'] not in flavor:
+            return 0
 
-    jobDetails = jobDict(data)
-    hadoopstack.main.mongo.db.job.insert(jobDetails)
-    id_t = str(jobDetails['_id'])
+    hadoopstack.main.mongo.db.job.insert(data)
+
+    id_t = str(data['_id'])
+    data['job']['id'] = id_t
+    flush_data_to_mongo('job', data)
+
     create_ret = {}
     create_ret['job_id'] = id_t
+
+    Process(target = cluster.create, args = (data,)).start()
+
     return create_ret
 
 def delete(job_id):
 
-    job_info = info(job_id)['jobs']
+    job = info(job_id)
 
     # TODO: Request Cluster API for Cluster Deletion
 
-    print job_info['status']
-    if ( 
-        job_info['status'] != 'deleted' and
-        job_info['status'] != 'completed'
+    print job['job']['status']
+    if (
+        job['job']['status'] != 'terminated' and
+        job['job']['status'] != 'completed'
         ):
-        # Not Actually deleted the job from the Database, setting the status to DELETED
-        hadoopstack.main.mongo.db.job.update({"_id": objectid.ObjectId(job_id)},
-                                             { "$set": { 'status' : 'deleted' }})
-        return ('Deleted Job', 200)
+        
+        cluster.delete(job_id)
+        job['job']['status'] = 'terminated'
+        flush_data_to_mongo('job', job)
+
+        return ('Terminated Job', 200)
 
     else:
         return ("Job isn't running", 412)
@@ -56,16 +67,13 @@ def delete(job_id):
 def info(job_id):
 
     job_info = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
-    job_info["_id"] = job_id
-    job_dict = {"jobs": job_info}  
-    return job_dict
+    return job_info
 
 def job_list():
 
     jobs_dict = {"jobs": []}
     for i in list(hadoopstack.main.mongo.db.job.find()):
-        i["_id"] = str(i["_id"])
-        jobs_dict["jobs"].append(i)
+        jobs_dict["jobs"].append(i['job'])
 
     return jobs_dict
 
