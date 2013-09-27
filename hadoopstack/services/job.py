@@ -82,6 +82,7 @@ def delete(job_id):
 def info(job_id):
 
     job_info = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+    job_info.pop('_id')
     return job_info
 
 def job_list():
