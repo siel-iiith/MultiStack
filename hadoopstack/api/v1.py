@@ -39,39 +39,3 @@ def job_api(job_id):
         
     elif request.method == "DELETE":
         return job.delete(job_id)
-
-@app_v1.route('/clusters', methods = ['GET','POST','PUT'])
-def clusters_api():
-    '''
-        Cluster API
-    '''
-    if request.method == 'GET':
-        return jsonify(**cluster.list_clusters())
-
-    if request.method == 'POST':
-        data = request.json
-        cid = cluster.create(data)
-        return jsonify(**cid)
-
-    if request.method == 'PUT':
-        data = request.json
-
-    return "To Be Implemented"
-
-@app_v1.route('/clusters/<cluster_id>/add', methods = ['POST'])
-def add(cluster_id):
-    '''
-    API to add noe to a cluster
-    '''
-
-    data = request.json
-    cluster.add_node(data, cluster_id)
-    return
-
-@app_v1.route('/clusters/<cluster_id>', methods = ['GET','DELETE'])
-def cluster_api(cluster_id):
-    if request.method == "DELETE":
-        return cluster.delete(cluster_id)
-
-    return "To Be Implemented"
-
