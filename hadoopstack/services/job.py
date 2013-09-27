@@ -1,6 +1,8 @@
 from hadoopstack import config
 from time import sleep
 from multiprocessing import Process
+from flask import make_response
+from flask import jsonify
 
 import hadoopstack
 import simplejson
@@ -29,7 +31,7 @@ def create(data):
 
     Process(target = cluster.create, args = (data,)).start()
 
-    return (create_ret, 200)
+    return make_response(jsonify(**create_ret), 202)
 
 def validate(data):
 
@@ -38,22 +40,22 @@ def validate(data):
     existing_job = hadoopstack.main.mongo.db.job.find_one({'job.name': data['job']['name']})
 
     if existing_job != None:
-        return ("JOB_ALREADY_EXISTS", 400)
+        return make_response("JOB_ALREADY_EXISTS", 400)
 
     if 's3://' not in data['job']['input']:
         if 'swift://' not in data['job']['input']:
-            return ("INVALID_INPUT_LOCATION", 400 )
+            return make_response("INVALID_INPUT_LOCATION", 400 )
 
     if 's3://' not in data['job']['output']: 
         if 'swift://' not in data['job']['output']:
-            return ("INVALID_OUTPUT_LOCATION", 400)
+            return make_response("INVALID_OUTPUT_LOCATION", 400)
 
     if data['job']['master']['flavor'] not in flavor:
-        return ("FLAVOR_NOT_FOUND", 400)
+        return make_response("FLAVOR_NOT_FOUND", 400)
 
     for slave in data['job']['slaves']:
         if slave['flavor'] not in flavor:
-            return ("FLAVOR_NOT_FOUND", 400)
+            return make_response("FLAVOR_NOT_FOUND", 400)
 
     return True
 
@@ -61,22 +63,21 @@ def delete(job_id):
 
     job = info(job_id)
 
-    # TODO: Request Cluster API for Cluster Deletion
-
-    print job['job']['status']
     if (
         job['job']['status'] != 'terminated' and
         job['job']['status'] != 'completed'
         ):
         
-        cluster.delete(job_id)
-        job['job']['status'] = 'terminated'
-        flush_data_to_mongo('job', job)
+        if cluster.delete(job_id):
+            job['job']['status'] = 'terminated'
+            flush_data_to_mongo('job', job)
 
-        return ('Terminated Job', 200)
+            return make_response('', 204)
+
+        return make_response('JOB_TERMINATION_FAILED', 500)
 
     else:
-        return ("Job isn't running", 412)
+        return make_response("JOB_NOT_FOUND", 412)
 
 def info(job_id):
 

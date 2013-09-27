@@ -1,5 +1,5 @@
-from flask import Blueprint, Flask, request, session, url_for, redirect, \
-     render_template, abort, g, flash, jsonify
+from flask import Blueprint, Flask, request, session, url_for, redirect, jsonify
+
 from hadoopstack.services import job
 from hadoopstack.services import cluster
 
@@ -29,15 +29,7 @@ def jobs_api():
 
     elif request.method == 'POST':
         data = request.json
-        job_id = job.create(data)
-
-        if job_id == 0:
-            return "Error: Invalid input"
-
-        if job_id[1] in [200, 202]:
-            return jsonify(**job_id[0])
-        else:
-            return job_id
+        return job.create(data)
 
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):

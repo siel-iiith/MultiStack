@@ -122,7 +122,7 @@ def delete(cid):
 
     ec2.release_public_ips(conn, public_ips)
 
-    return ('Terminated Job', 200)
+    return True
 
 
 def list_clusters():
