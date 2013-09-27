@@ -7,28 +7,28 @@ unset ALL_PROXY
 
 delete()
 {
-    curl -X DELETE http://localhost:5000/v1/jobs/$1
+    curl -i -X DELETE http://localhost:5000/v1/jobs/$1
 }
 
 create()
 {
-    curl \
+    curl -i \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "{\"job\":{\"name\":\"14715\",\"jar\":\"file_mapped.jar\",\"deadline\":\"16/06/2013\",\"input\":\"s3://\",\"output\":\"s3://\",\"master\": {\"flavor\":\"m1.small\"},\"slaves\": [{\"flavor\":\"m1.small\",\"instances\":1}, {\"flavor\":\"m1.large\",\"instances\":1}]}}" \
+    --data "{\"job\":{\"name\":\"$RANDOM\",\"jar\":\"file_mapped.jar\",\"deadline\":\"16/06/2013\",\"input\":\"s3://\",\"output\":\"s3://\",\"master\": {\"flavor\":\"m1.small\"},\"slaves\": [{\"flavor\":\"m1.small\",\"instances\":1}]}}" \
     http://localhost:5000/v1/jobs
 
 }
 
 get()
 {
-    curl http://localhost:5000/v1/jobs
+    curl -i http://localhost:5000/v1/jobs
 }
 
 info()
 {
-    curl http://localhost:5000/v1/jobs/$1
+    curl -i http://localhost:5000/v1/jobs/$1
 }
 
 case $1 in
