@@ -11,24 +11,12 @@ from bson import objectid
 
 def create(data):
 
-    flavor = ['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
-
     # Validation
-    name = hadoopstack.main.mongo.db.job.find_one({'name': data['job']['name']})
 
-    if name != None:
-        return 0
-    if 's3://' not in data['job']['input']:
-        if 'swift://' not in data['job']['input']:
-            return 0
-    if 's3://' not in data['job']['output']: 
-        if 'swift://' not in data['job']['output']:
-            return 0
-    if data['job']['master']['flavor'] not in flavor:
-        return 0
-    for slave in data['job']['slaves']:
-        if slave['flavor'] not in flavor:
-            return 0
+    validation_result = validate(data)
+
+    if validation_result != True:
+        return validation_result
 
     hadoopstack.main.mongo.db.job.insert(data)
 
@@ -41,7 +29,33 @@ def create(data):
 
     Process(target = cluster.create, args = (data,)).start()
 
-    return create_ret
+    return (create_ret, 200)
+
+def validate(data):
+
+    flavor = ['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
+
+    existing_job = hadoopstack.main.mongo.db.job.find_one({'job.name': data['job']['name']})
+
+    if existing_job != None:
+        return ("JOB_ALREADY_EXISTS", 400)
+
+    if 's3://' not in data['job']['input']:
+        if 'swift://' not in data['job']['input']:
+            return ("INVALID_INPUT_LOCATION", 400 )
+
+    if 's3://' not in data['job']['output']: 
+        if 'swift://' not in data['job']['output']:
+            return ("INVALID_OUTPUT_LOCATION", 400)
+
+    if data['job']['master']['flavor'] not in flavor:
+        return ("FLAVOR_NOT_FOUND", 400)
+
+    for slave in data['job']['slaves']:
+        if slave['flavor'] not in flavor:
+            return ("FLAVOR_NOT_FOUND", 400)
+
+    return True
 
 def delete(job_id):
 

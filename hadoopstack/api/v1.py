@@ -33,8 +33,11 @@ def jobs_api():
 
         if job_id == 0:
             return "Error: Invalid input"
-        
-        return jsonify(**job_id)
+
+        if job_id[1] in [200, 202]:
+            return jsonify(**job_id[0])
+        else:
+            return job_id
 
 @app_v1.route('/jobs/<job_id>', methods = ['GET','DELETE'])
 def job_api(job_id):
