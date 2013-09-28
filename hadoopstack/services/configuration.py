@@ -33,13 +33,13 @@ def ssh_check(instance_ip, key_location):
         
         return True
 
-def _configure_master(private_ip_address, key_location, job_name):
+def configure_master(private_ip_address, key_location, job_name):
     subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
         -N {2}-master --sudo -r 'recipe[hadoopstack::master]' \
         --no-host-key-verify".format(private_ip_address,
          key_location, job_name)).split())
 
-def _configure_slave(private_ip_address, key_location, job_name, count):
+def configure_slave(private_ip_address, key_location, job_name, count):
     subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
         -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' \
         --no-host-key-verify".format(private_ip_address,
@@ -65,8 +65,8 @@ def configure_cluster(data):
             continue
 
         if node['role'] == 'master':
-            _configure_master(node['private_ip_address'], key_location, job_name)
+            configure_master(node['private_ip_address'], key_location, job_name)
 
         elif node['role'] == 'slave':
-            _configure_slave(node['private_ip_address'], key_location, job_name, slave_count)
+            configure_slave(node['private_ip_address'], key_location, job_name, slave_count)
             slave_count += 1
