@@ -1,6 +1,8 @@
 import paramiko
 import socket
 import subprocess
+import random
+
 from time import sleep
 
 from hadoopstack import config
@@ -40,10 +42,15 @@ def configure_master(private_ip_address, key_location, job_name):
          key_location, job_name)).split())
 
 def configure_slave(private_ip_address, key_location, job_name, count):
-    subprocess.call(("knife bootstrap {0} -x ubuntu -i {1} \
+    subprocess.call((
+        "knife bootstrap {0} -x ubuntu -i {1} \
         -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' \
         --no-host-key-verify".format(private_ip_address,
-         key_location, job_name, count)).split())
+            key_location,
+            job_name,
+            str(random.random()).split('.')[1])
+        ).split()
+    )
 
 def configure_cluster(data):
     '''
