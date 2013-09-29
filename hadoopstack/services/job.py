@@ -35,7 +35,7 @@ def create(data):
 
 def validate(data):
 
-    flavor = ['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
+    flavor = ['t1.micro', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
 
     existing_job = hadoopstack.main.mongo.db.job.find_one({'job.name': data['job']['name']})
 
@@ -92,3 +92,8 @@ def job_list():
         jobs_dict["jobs"].append(i['job'])
 
     return jobs_dict
+
+def add(data, job_id):
+
+    Process(target = cluster.add_nodes, args = (data, job_id)).start()
+    return make_response('', 202)

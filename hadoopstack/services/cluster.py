@@ -8,6 +8,7 @@ from hadoopstack.dbOperations.db import flush_data_to_mongo
 from hadoopstack.dbOperations.db import update_private_ip_address
 
 from hadoopstack.services.configuration import configure_cluster
+from hadoopstack.services.configuration import configure_slave
 from hadoopstack.services import ec2
 
 from bson import objectid
@@ -59,7 +60,6 @@ def create(data):
     # TODO: We need to create an request-check/validation filter before inserting
 
     spawn(data)
-
     configure_cluster(data)
     
     return
@@ -130,3 +130,36 @@ def list_clusters():
     for i in list(hadoopstack.main.mongo.db.job.find()):
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
+
+def add_nodes(data, job_id):
+
+    conn = ec2.make_connection()
+
+    job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+    job_obj = job_db_item['job']
+    job_name = job_obj['name']
+
+    keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
+    key_location = config.DEFAULT_KEY_LOCATION + '/'  + keypair_name + '.pem'
+
+    for slave in data['slaves']:
+        res_slave = ec2.boot_instances(
+                conn,
+                slave['instances'],
+                keypair_name,
+                [sec_master],
+                flavor = slave['flavor']
+                )
+
+        # Incrementing the number of slaves in job object
+        for count in range (0, len(job_obj['slaves'])):
+            if slave['flavor'] == job_obj['slaves'][count]['flavor']:
+                job_obj['slaves'][count]['instances'] += 1
+
+        node_obj = get_node_objects(conn, "slave", res_slave.id)
+        job_obj['nodes'] += node_obj
+        job_db_item['job'] = job_obj
+        flush_data_to_mongo('job', job_db_item)
+
+        for node in node_obj:
+            configure_slave(node['private_ip_address'], key_location, job_name)

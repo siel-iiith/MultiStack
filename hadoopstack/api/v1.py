@@ -39,3 +39,9 @@ def job_api(job_id):
         
     elif request.method == "DELETE":
         return job.delete(job_id)
+
+
+@app_v1.route('/jobs/<job_id>/add', methods = ['POST'])
+def add(job_id):
+    if request.method == "POST":
+        return job.add(request.json, job_id)
