@@ -3,7 +3,9 @@ import socket
 import subprocess
 from time import sleep
 
-from hadoopstack import config
+
+
+from hadoopstack.services.make_config_parser import configParserHelper
 
 def ssh_check(instance_ip, key_location):
     '''
@@ -50,10 +52,17 @@ def configure_cluster(data):
     Configure Hadoop on the cluster using Chef
 
     '''
+   
+   
+
+
+
 
     job_name = data['job']['name']
+    key_location = configParserHelper().get("commonConfig","DEFAULT_KEY_LOCATION") + "/hadoopstack-" + job_name + ".pem"
+ 
 
-    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + job_name + ".pem"
+    
     slave_count = 1
 
     for node in data['job']['nodes']:

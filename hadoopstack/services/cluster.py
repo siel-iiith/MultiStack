@@ -9,10 +9,12 @@ from hadoopstack.dbOperations.db import update_private_ip_address
 
 from hadoopstack.services.configuration import configure_cluster
 from hadoopstack.services import ec2
-
+from hadoopstack.services.make_config_parser import configParserHelper
 from bson import objectid
 
-def spawn(data):
+def spawn(data,decider = "privateCloudConfig"):
+	 
+    image_id = configParserHelper().get(decider,"DEFAULT_IMAGE_ID")
 
     data['job']['nodes'] = []
     data['job']['status'] = 'spawning'
@@ -32,7 +34,9 @@ def spawn(data):
         1,
         keypair_name,
         [sec_master],
-        flavor = master['flavor']
+        flavor = master['flavor'],
+		image_id = image_id,
+		decider = decider
         )
     data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
     flush_data_to_mongo('job', data)
@@ -45,7 +49,9 @@ def spawn(data):
             slave['instances'],
             keypair_name,
             [sec_slave],
-            flavor = slave['flavor']
+            flavor = slave['flavor'],
+			image_id = image_id,
+			decider = decider
             )
         data['job']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
         flush_data_to_mongo('job', data)
@@ -54,7 +60,7 @@ def spawn(data):
 
     return
 
-def create(data):
+def create(data,decider="privateCloudConfig"):
 
     # TODO: We need to create an request-check/validation filter before inserting
 
