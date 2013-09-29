@@ -5,7 +5,6 @@ import simplejson
     
 from hadoopstack.dbOperations.db import get_node_objects
 from hadoopstack.dbOperations.db import flush_data_to_mongo
-from hadoopstack.dbOperations.db import update_private_ip_address
 
 from hadoopstack.services.configuration import configure_cluster
 from hadoopstack.services.configuration import configure_slave
@@ -35,6 +34,7 @@ def spawn(data):
         [sec_master],
         flavor = master['flavor']
         )
+
     data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
     flush_data_to_mongo('job', data)
 
@@ -50,8 +50,6 @@ def spawn(data):
             )
         data['job']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
         flush_data_to_mongo('job', data)
-
-    update_private_ip_address(conn, data)
 
     return
 
