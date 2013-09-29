@@ -41,6 +41,16 @@ add()
     http://localhost:5000/v1/jobs/$1/add
 }
 
+rm()
+{
+    curl -i \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    -X POST \
+    --data "{\"slaves\": [{\"flavor\":\"t1.micro\",\"instances\":1}, {\"flavor\":\"m1.small\",\"instances\":1}]}" \
+    http://localhost:5000/v1/jobs/$1/rm
+}
+
 
 case $1 in
     list)
@@ -57,5 +67,8 @@ case $1 in
         ;;
     add)
         add $2
+        ;;
+    rm)
+        rm $2
         ;;
 esac

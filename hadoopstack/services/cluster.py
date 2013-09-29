@@ -138,6 +138,7 @@ def add_nodes(data, job_id):
     job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
     job_name = job_obj['name']
+    new_node_obj_list = list()
 
     keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
     key_location = config.DEFAULT_KEY_LOCATION + '/'  + keypair_name + '.pem'
@@ -158,8 +159,33 @@ def add_nodes(data, job_id):
 
         node_obj = get_node_objects(conn, "slave", res_slave.id)
         job_obj['nodes'] += node_obj
+        new_node_obj_list += node_obj
         job_db_item['job'] = job_obj
         flush_data_to_mongo('job', job_db_item)
 
-        for node in node_obj:
-            configure_slave(node['private_ip_address'], key_location, job_name)
+    for new_node_obj in new_node_obj_list:
+        configure_slave(new_node_obj['private_ip_address'], key_location, job_name)
+
+def remove_nodes(data, job_id):
+
+    conn = ec2.make_connection()
+
+    job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+    job_obj = job_db_item['job']
+
+    for slave in data['slaves']:
+        for node in job_obj['nodes']:
+            if slave['flavor'] == node['flavor'] and node['role'] != 'master':
+                conn.terminate_instances(node['id'].split())
+                slave['instances'] -=1
+                job_obj['nodes'].remove(node)
+            if slave['instances'] == 0:
+                break
+
+    # Decrementing the number of slaves in job object
+    for count in range (0, len(job_obj['slaves'])):
+        if slave['flavor'] == job_obj['slaves'][count]['flavor']:
+            job_obj['slaves'][count]['instances'] -= 1
+
+    job_db_item['job'] = job_obj
+    flush_data_to_mongo('job', job_db_item)

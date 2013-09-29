@@ -45,3 +45,8 @@ def job_api(job_id):
 def add(job_id):
     if request.method == "POST":
         return job.add(request.json, job_id)
+
+@app_v1.route('/jobs/<job_id>/rm', methods = ['POST'])
+def remove(job_id):
+    if request.method == "POST":
+        return job.remove(request.json, job_id)
