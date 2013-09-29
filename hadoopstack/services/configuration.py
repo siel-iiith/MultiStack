@@ -41,7 +41,7 @@ def configure_master(private_ip_address, key_location, job_name):
         --no-host-key-verify".format(private_ip_address,
          key_location, job_name)).split())
 
-def configure_slave(private_ip_address, key_location, job_name, count):
+def configure_slave(private_ip_address, key_location, job_name):
     subprocess.call((
         "knife bootstrap {0} -x ubuntu -i {1} \
         -N {2}-slave-{3} --sudo -r 'recipe[hadoopstack::slave]' \
@@ -75,5 +75,5 @@ def configure_cluster(data):
             configure_master(node['private_ip_address'], key_location, job_name)
 
         elif node['role'] == 'slave':
-            configure_slave(node['private_ip_address'], key_location, job_name, slave_count)
+            configure_slave(node['private_ip_address'], key_location, job_name)
             slave_count += 1
