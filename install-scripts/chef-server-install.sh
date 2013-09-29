@@ -12,14 +12,21 @@ download_install_chef() {
 }
 
 configure_chef_server() {
+
 	chef_server_ip=`ifconfig eth0 | grep -i 'inet '| cut -d ':' -f 2 | cut -d ' ' -f 1`
+
+	if [ -n http_proxy ] || [ -n HTTP_PROXY ]
+		then
+		export no_proxy=localhost,127.0.0.1
+	fi
+
 	chef-server-ctl reconfigure
 }
 
 configure_knife() {
 
-	mkdir $USER/.chef
-	touch $USER/.chef/knife.rb
+	mkdir $HOME/.chef
+	touch $HOME/.chef/knife.rb
 
 	knife configure -u $USER \
 	--validation-client-name chef-validator \
