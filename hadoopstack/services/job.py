@@ -6,11 +6,12 @@ import hadoopstack
 import simplejson
 
 from hadoopstack.dbOperations.db import flush_data_to_mongo
+from hadoopstack.scheduler.schedulerModule_v1 import scheduler
 import hadoopstack.services.cluster as cluster
+
 from bson import objectid
 
 def create(data):
-
     flavor = ['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
 
     # Validation
@@ -29,19 +30,26 @@ def create(data):
     for slave in data['job']['slaves']:
         if slave['flavor'] not in flavor:
             return 0
-
+   
     hadoopstack.main.mongo.db.job.insert(data)
-
     id_t = str(data['_id'])
     data['job']['id'] = id_t
     flush_data_to_mongo('job', data)
 
     create_ret = {}
     create_ret['job_id'] = id_t
-
-    Process(target = cluster.create, args = (data,)).start()
-
-    return create_ret
+    decider = scheduler(data,"create")
+	#dic = {}
+	#    dic['RAM'] = totalRAM
+	#    dic['VCPU'] = totalVCPU
+	#return dic	
+	#Process(target = cluster.create, args = (data,)).start()
+    if(decider == 0):
+        create_ret['job_id'] = 0
+        return create_ret
+    else:
+        return create_ret
+		
 
 def delete(job_id):
 
@@ -55,9 +63,10 @@ def delete(job_id):
         job['job']['status'] != 'completed'
         ):
         
-        cluster.delete(job_id)
+        Process(target = cluster.delete, args = (job_id,)).start()
         job['job']['status'] = 'terminated'
         flush_data_to_mongo('job', job)
+        scheduler(job,"delete")
 
         return ('Terminated Job', 200)
 
