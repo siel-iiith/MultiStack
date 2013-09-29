@@ -92,13 +92,3 @@ def job_list():
         jobs_dict["jobs"].append(i['job'])
 
     return jobs_dict
-
-def Scheduler(job_id):
-   
-    # A FiFo Scheduler implemented
-    return
-    for i in hadoopstack.main.mongo.db.job.find().sort("submission_time"):
-        if i["_id"]!=objectid.ObjectId(job_id["job_id"]):
-            while i["status"]!="completed":
-                pass
-
