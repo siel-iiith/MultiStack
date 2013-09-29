@@ -46,7 +46,7 @@ def get_node_objects(conn, role, resv_id=None):
 	return nodes
 
 def flush_data_to_mongo(db_name, data_dict):
-
+	print data_dict
 	if db_name == "job":
 		hadoopstack.main.mongo.db.job.save(data_dict)
 

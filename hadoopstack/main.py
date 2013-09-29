@@ -4,6 +4,7 @@ from hadoopstack.api.v1 import app_v1
 from flask.ext.pymongo import PyMongo
 from hadoopstack import config
 
+
 app = Flask(__name__)
 app.config.from_object(config)
 app.register_blueprint(app_v1)
