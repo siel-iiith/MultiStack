@@ -32,7 +32,10 @@ def scheduler(data, operation):
         cloudDic['vcpu'] += totalVCPU
         cloudDic['instance'] += totalInstance
         hadoopstack.main.mongo.db.cloudDetails.save(cloudDic)
+
+        job_id = data['job']['id']
         Process(target = cluster.delete, args = (job_id,)).start()
+        return True
 
 def priorityCalculator(totalRAM,totalVCPU,totalInstance):
     for i in range(1,-1,-1):
@@ -63,13 +66,12 @@ def calculateUsage(data,operation):
     totalRAM += int(Config.get(master,"ram"))
     totalVCPUs += int(Config.get(master,"vcpu"))
     totalInstance += 1
-    print totalRAM,totalVCPUs   
-    for slave in data['job']['slaves']:
 
+    for slave in data['job']['slaves']:
         totalRAM += int(Config.get(slave['flavor'],"ram"))
         totalVCPUs += int(Config.get(slave['flavor'],"vcpu"))
         totalInstance += 1
-        print totalRAM,totalVCPUs
+
     return totalRAM,totalVCPUs,totalInstance
 
 

@@ -27,13 +27,14 @@ def create(data):
     flush_data_to_mongo('job', data)
 
     create_ret = {}
-    create_ret['job_id'] = id_t
     
     if scheduler(data, 'create'):
-        create_ret['job_id'] = 0
-        return create_ret
+        print "scheduler.{0}".format(str(data))
+        create_ret['job_id'] = id_t
+        return make_response(jsonify(**create_ret), 202)
     else:
-        return create_ret
+        create_ret['error'] = "job_init_failed"
+        return make_response(jsonify(**create_ret), 500)
 
     return make_response(jsonify(**create_ret), 202)
 
@@ -72,7 +73,7 @@ def delete(job_id):
         job['job']['status'] != 'completed'
         ):
         
-        if scheduler(job,"delete"):
+        if scheduler(job, "delete"):
             return make_response('', 204)
 
         return make_response('JOB_TERMINATION_FAILED', 500)

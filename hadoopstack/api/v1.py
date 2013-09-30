@@ -23,7 +23,7 @@ def jobs_api():
     '''
         Jobs API
     '''
-    
+
     if request.method == 'GET':
         return jsonify(**job.job_list())
 
@@ -36,10 +36,9 @@ def job_api(job_id):
 
     if request.method == "GET":
         return jsonify(job.info(job_id))
-        
+
     elif request.method == "DELETE":
         return job.delete(job_id)
-
 
 @app_v1.route('/jobs/<job_id>/add', methods = ['POST'])
 def add(job_id):
