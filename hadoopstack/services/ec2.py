@@ -3,11 +3,11 @@ from boto.ec2.regioninfo import EC2RegionInfo
 from time import sleep
 
 from hadoopstack import config
+from hadoopstack.services.make_config_parser import configParserHelper
 
-def make_connection():
-    url = config.EC2_URL
+def make_connection(decider = "privateCloudConfig"):
+    url = configParserHelper().get(decider,"EC2_URL")
     url_path = str()
-
     url_endpoint = url.split('/')[2]
     url_protocol = url.split('/')[0].split(':')[0]
     if url_protocol == "https":
@@ -19,11 +19,12 @@ def make_connection():
         url_port = url.split(':')[2].split('/')[0]
         url_path = url.split(url_port)[1]
     
-    hs_region = EC2RegionInfo(name = config.EC2_REGION, endpoint = url_endpoint)
-
+    hs_region = EC2RegionInfo(name = configParserHelper().get(decider,"EC2_REGION"), endpoint = url_endpoint)
+    
     conn=EC2Connection(
-                    aws_access_key_id = config.EC2_ACCESS_KEY,
-                    aws_secret_access_key = config.EC2_SECRET_KEY,
+                    aws_access_key_id = configParserHelper().get(decider,"EC2_ACCESS_KEY"),
+    
+                    aws_secret_access_key = configParserHelper().get(decider,"EC2_SECRET_KEY"),
                     is_secure = secure,
                     path = url_path,
                     region = hs_region
@@ -57,7 +58,8 @@ def boot_instances(conn,
                     keypair,
                     security_groups,
                     flavor,
-                    image_id = config.DEFAULT_IMAGE_ID
+                    image_id ,
+                    decider = "privateCloudConfig"
                     ):
     
     connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
@@ -72,8 +74,8 @@ def boot_instances(conn,
 def create_keypair(conn, keypair_name):
     
     keypair = conn.create_key_pair(keypair_name)
-    keypair.save(config.DEFAULT_KEY_LOCATION)
-#   hadoopstack.main.mongo.db.keypair.insert(keypair.__dict__)
+    keypair.save(configParserHelper().get("commonConfig","DEFAULT_KEY_LOCATION"))
+
     # TODO - Save this keypair file in the mongodb
 
 def create_security_groups(conn, sec_master_name, sec_slave_name):

@@ -5,7 +5,9 @@ import random
 
 from time import sleep
 
-from hadoopstack import config
+
+
+from hadoopstack.services.make_config_parser import configParserHelper
 
 def ssh_check(instance_ip, key_location):
     '''
@@ -73,9 +75,8 @@ def configure_cluster(data):
     '''
 
     job_name = data['job']['name']
-
-    key_location = config.DEFAULT_KEY_LOCATION + "/hadoopstack-" + job_name + ".pem"
-
+    key_location = configParserHelper().get("commonConfig","DEFAULT_KEY_LOCATION") + "/hadoopstack-" + job_name + ".pem"
+ 
     for node in data['job']['nodes']:
 
         if node['role'] == 'master':
