@@ -8,7 +8,7 @@ import hadoopstack
 import simplejson
 
 from hadoopstack.dbOperations.db import flush_data_to_mongo
-from hadoopstack.scheduler.schedulerModule_v1 import scheduler
+from hadoopstack.scheduler.scheduler import schedule
 import hadoopstack.services.cluster as cluster
 
 from bson import objectid
@@ -17,6 +17,7 @@ def create(data):
     # Validation
 
     validation_result = validate(data)
+    create_ret = dict()
 
     if validation_result != True:
         return validation_result
@@ -25,11 +26,9 @@ def create(data):
     id_t = str(data['_id'])
     data['job']['id'] = id_t
     flush_data_to_mongo('job', data)
-
-    create_ret = {}
     
-    if scheduler(data, 'create'):
-        print "scheduler.{0}".format(str(data))
+    if schedule(data, 'create'):
+        print "schedule.{0}".format(str(data))
         create_ret['job_id'] = id_t
         return make_response(jsonify(**create_ret), 202)
     else:
@@ -73,7 +72,7 @@ def delete(job_id):
         job['job']['status'] != 'completed'
         ):
         
-        if scheduler(job, "delete"):
+        if schedule(job, "delete"):
             return make_response('', 204)
 
         return make_response('JOB_TERMINATION_FAILED', 500)

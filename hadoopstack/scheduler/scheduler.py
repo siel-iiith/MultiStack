@@ -1,11 +1,13 @@
 import hadoopstack
-from multiprocessing import Process
-from hadoopstack.services.make_config_parser import configParserHelper
 import hadoopstack.services.cluster as cluster
+
+from multiprocessing import Process
+
+from hadoopstack.services.make_config_parser import configParserHelper
 
 Config = configParserHelper("hadoopstack/flavorConfig.py")
 
-def scheduler(data, operation):
+def schedule(data, operation):
     if(operation == "create"):
         totalRAM,totalVCPU,totalInstance = calculateUsage(data,operation)
         cloudDic,decider = priorityCalculator(totalRAM,totalVCPU,totalInstance)
