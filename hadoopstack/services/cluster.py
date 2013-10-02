@@ -134,9 +134,9 @@ def list_clusters():
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
 
-def add_nodes(data, job_id):
+def add_nodes(data, cloud, job_id):
 
-    conn = ec2.make_connection()
+    conn = ec2.make_connection(cloud['auth'])
 
     job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
@@ -144,7 +144,7 @@ def add_nodes(data, job_id):
     new_node_obj_list = list()
 
     keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
-    key_location = config.DEFAULT_KEY_LOCATION + '/'  + keypair_name + '.pem'
+    key_location = '/tmp/'  + keypair_name + '.pem'
 
     for slave in data['slaves']:
         res_slave = ec2.boot_instances(
@@ -152,7 +152,8 @@ def add_nodes(data, job_id):
                 slave['instances'],
                 keypair_name,
                 [sec_master],
-                flavor = slave['flavor']
+                slave['flavor'],
+                cloud['default_image_id']
                 )
 
         # Incrementing the number of slaves in job object

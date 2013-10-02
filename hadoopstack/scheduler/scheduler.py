@@ -2,13 +2,15 @@ from multiprocessing import Process
 
 from hadoopstack import config
 from hadoopstack.dbOperations import db
+
 import hadoopstack
 import hadoopstack.services.cluster as cluster
+import hadoopstack.services.job
 
 def schedule(data, operation):
     """Schedules based on certain filters"""
 
-    if(operation == 'create'):
+    if operation == 'create':
         conf = config.read_conf()
 
         clouds = filter_quota(data, conf)
@@ -24,9 +26,8 @@ def schedule(data, operation):
 
         update_quota(data, cloud, operation)
         Process(target = cluster.create, args = (data, cloud)).start()
-        return True
 
-    elif(operation == 'delete'):
+    elif operation == 'delete':
 
         job_id = data['job']['id']
 
@@ -37,7 +38,23 @@ def schedule(data, operation):
 
         Process(target = cluster.delete, args = (job_id, cloud)).start()
         update_quota(data, cloud, operation)
-        return True
+
+    elif operation == "add":
+
+        job_id = data['id']
+        job_obj = hadoopstack.services.job.info(job_id)
+
+        conf = config.read_conf()
+        for cloud in conf['clouds']:
+            if cloud['name'] == job_obj['job']['cloud']:
+                break
+
+        job_obj['job'] = data
+
+        update_quota(job_obj, cloud, operation)
+        Process(target = cluster.add_nodes, args = (data, cloud, job_id)).start()
+
+    return True
 
 def update_quota(data, cloud, operation):
     """Update the avaiable quota of a cloud"""
@@ -49,6 +66,12 @@ def update_quota(data, cloud, operation):
         cloud['quota']['available']['instances'] += instances
 
     if operation == 'delete':
+        ram, vcpus, instances = calculate_usage(cloud, data)
+        cloud['quota']['available']['ram'] -= ram
+        cloud['quota']['available']['vcpus'] -= vcpus
+        cloud['quota']['available']['instances'] -= instances
+
+    if operation == 'add':
         ram, vcpus, instances = calculate_usage(cloud, data)
         cloud['quota']['available']['ram'] -= ram
         cloud['quota']['available']['vcpus'] -= vcpus
@@ -115,10 +138,11 @@ def calculate_usage(cloud, data):
     job_vcpus = 0
     job_instances = 0
 
-    master_flavor = data['job']['master']['flavor'].replace('.', '_')
-    job_ram += cloud['flavors'][master_flavor]['ram']
-    job_vcpus += cloud['flavors'][master_flavor]['vcpus']
-    job_instances += 1
+    if data['job'].has_key('master'):
+        master_flavor = data['job']['master']['flavor'].replace('.', '_')
+        job_ram += cloud['flavors'][master_flavor]['ram']
+        job_vcpus += cloud['flavors'][master_flavor]['vcpus']
+        job_instances += 1
 
     for slave in data['job']['slaves']:
         slave_flavor = slave['flavor'].replace('.', '_')
