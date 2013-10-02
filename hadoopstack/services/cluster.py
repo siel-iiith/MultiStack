@@ -11,6 +11,17 @@ from hadoopstack.services import ec2
 from bson import objectid
 
 def spawn(data, cloud):
+    """
+    Generates the keypair and creates security groups specific to the
+    cluster and boots the instances.
+
+    @param data: The job document stored in mongo database.
+    @type data: dict
+
+    @param cloud: Cloud object containing information of a specific
+    cloud provider.
+    @type cloud: dict
+    """
 
     image_id = cloud['default_image_id']
 
@@ -56,6 +67,16 @@ def spawn(data, cloud):
     return
 
 def create(data, cloud):
+    """
+    Creates the cluster - provisioning and configuration
+
+    @param data: The job document stored in mongo database.
+    @type data: dict
+
+    @param cloud: Cloud object containing information of a specific
+    cloud provider.
+    @type cloud: dict
+    """
 
     # TODO: We need to create an request-check/validation filter before inserting
 
@@ -65,7 +86,16 @@ def create(data, cloud):
     return
 
 def delete(cid, cloud):
-    """Delete a Job and associated cluster"""
+    """
+    Deletes the cluster
+
+    @param cid: Cluster ID
+    @type data: string
+
+    @param cloud: Cloud object containing information of a specific
+    cloud provider.
+    @type cloud: dict
+    """
 
     job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
@@ -135,6 +165,19 @@ def list_clusters():
     return clusters_dict
 
 def add_nodes(data, cloud, job_id):
+    """
+    Add nodes to a cluster and updates the job object
+
+    @param data: The job document stored in mongo database.
+    @type data: dict
+
+    @param cloud: Cloud object containing information of a specific
+    cloud provider.
+    @type cloud: dict
+
+    @param job_id: Job ID
+    @type job_id: string
+    """
 
     conn = ec2.make_connection(cloud['auth'])
 
@@ -171,6 +214,19 @@ def add_nodes(data, cloud, job_id):
         configure_slave(new_node_obj['private_ip_address'], key_location, job_name)
 
 def remove_nodes(data, cloud, job_id):
+    """
+    Removes Nodes from a running cluster and updates the Job object.
+
+    @param data: The job document stored in mongo database.
+    @type data: dict
+
+    @param cloud: Cloud object containing information of a specific
+    cloud provider.
+    @type cloud: dict
+
+    @param job_id: Job ID
+    @type job_id: string
+    """
 
     conn = ec2.make_connection(cloud['auth'])
 
