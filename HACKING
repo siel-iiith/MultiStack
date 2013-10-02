@@ -1,0 +1,7 @@
+The HadoopStack package can be initiated by running.
+
+$ python hs.py
+
+APIs(flask route calls) are to be written in api/v{n}.py files. This will help us maintain versioning. We're using Flask Blueprints to separate out flask app objects.
+
+http://flask.pocoo.org/docs/blueprints/

@@ -1,0 +1,6 @@
+flask
+flask-pymongo
+simplejson
+fabric
+requests
+boto==2.12.0
