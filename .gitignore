@@ -34,8 +34,6 @@ venv
 .mr.developer.cfg
 .project
 .pydevproject
-config.py
-properties
 *.swp
 *.swo
 *.swn
