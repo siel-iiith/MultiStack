@@ -1,10 +1,20 @@
+from time import sleep
+
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
 
-from time import sleep
+def make_connection(credentials):
+    """
+    A general function to connect cloud provider endpoing using EC2 API
 
-def make_connection(cloud):
-    url = cloud['auth']['ec2_url']
+    @param credentials: A dictionary containing ec2 specific parameters for
+    connecting to the endpoint.
+    @type credentials: dictionary
+
+    @return A boto ec2 connection object
+    """
+
+    url = credentials['ec2_url']
     url_path = str()
     url_endpoint = url.split('/')[2]
     url_protocol = url.split('/')[0].split(':')[0]
@@ -18,11 +28,11 @@ def make_connection(cloud):
         url_port = url.split(':')[2].split('/')[0]
         url_path = url.split(url_port)[1]
 
-    hs_region = EC2RegionInfo(name = cloud['auth']['ec2_region'], endpoint = url_endpoint)
+    hs_region = EC2RegionInfo(name = credentials['ec2_region'], endpoint = url_endpoint)
     
     conn = EC2Connection(
-                    aws_access_key_id = cloud['auth']['ec2_access_key'],
-                    aws_secret_access_key = cloud['auth']['ec2_secret_key'],
+                    aws_access_key_id = credentials['ec2_access_key'],
+                    aws_secret_access_key = credentials['ec2_secret_key'],
                     is_secure = secure,
                     path = url_path,
                     region = hs_region

@@ -21,7 +21,7 @@ def spawn(data, cloud):
     job_name = data['job']['name']
     keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
 
-    conn = ec2.make_connection(cloud)
+    conn = ec2.make_connection(cloud['auth'])
     ec2.create_keypair(conn, keypair_name)
     ec2.create_security_groups(conn, sec_master, sec_slave)
 
@@ -70,7 +70,7 @@ def delete(cid, cloud):
     job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
 
-    conn = ec2.make_connection(cloud)
+    conn = ec2.make_connection(cloud['auth'])
 
     keypair = 'hadoopstack-' + job_name
     security_groups = ['hadoopstack-' + job_name + '-master', 
