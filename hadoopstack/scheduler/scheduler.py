@@ -74,29 +74,17 @@ def schedule(data, operation):
 def update_quota(data, cloud, operation):
     """Update the avaiable quota of a cloud"""
 
-    if operation == 'create':
+    if operation == ('delete' or 'remove'):
         ram, vcpus, instances = calculate_usage(cloud, data)
         cloud['quota']['available']['ram'] += ram
         cloud['quota']['available']['vcpus'] += vcpus
         cloud['quota']['available']['instances'] += instances
 
-    if operation == 'delete':
+    if operation == ('add' or 'create'):
         ram, vcpus, instances = calculate_usage(cloud, data)
         cloud['quota']['available']['ram'] -= ram
         cloud['quota']['available']['vcpus'] -= vcpus
         cloud['quota']['available']['instances'] -= instances
-
-    if operation == 'add':
-        ram, vcpus, instances = calculate_usage(cloud, data)
-        cloud['quota']['available']['ram'] -= ram
-        cloud['quota']['available']['vcpus'] -= vcpus
-        cloud['quota']['available']['instances'] -= instances
-
-    if operation == 'remove':
-        ram, vcpus, instances = calculate_usage(cloud, data)
-        cloud['quota']['available']['ram'] += ram
-        cloud['quota']['available']['vcpus'] += vcpus
-        cloud['quota']['available']['instances'] += instances
 
     conf = config.read_conf()
     
