@@ -1,15 +1,14 @@
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
+
 from time import sleep
 
-from hadoopstack import config
-from hadoopstack.services.make_config_parser import configParserHelper
-
-def make_connection(decider = "privateCloudConfig"):
-    url = configParserHelper().get(decider,"EC2_URL")
+def make_connection(cloud):
+    url = cloud['auth']['ec2_url']
     url_path = str()
     url_endpoint = url.split('/')[2]
     url_protocol = url.split('/')[0].split(':')[0]
+
     if url_protocol == "https":
         secure = True
     elif url_protocol == "http":
@@ -18,13 +17,12 @@ def make_connection(decider = "privateCloudConfig"):
     if len(url.split(':')) > 2:
         url_port = url.split(':')[2].split('/')[0]
         url_path = url.split(url_port)[1]
+
+    hs_region = EC2RegionInfo(name = cloud['auth']['ec2_region'], endpoint = url_endpoint)
     
-    hs_region = EC2RegionInfo(name = configParserHelper().get(decider,"EC2_REGION"), endpoint = url_endpoint)
-    
-    conn=EC2Connection(
-                    aws_access_key_id = configParserHelper().get(decider,"EC2_ACCESS_KEY"),
-    
-                    aws_secret_access_key = configParserHelper().get(decider,"EC2_SECRET_KEY"),
+    conn = EC2Connection(
+                    aws_access_key_id = cloud['auth']['ec2_access_key'],
+                    aws_secret_access_key = cloud['auth']['ec2_secret_key'],
                     is_secure = secure,
                     path = url_path,
                     region = hs_region
@@ -58,8 +56,7 @@ def boot_instances(conn,
                     keypair,
                     security_groups,
                     flavor,
-                    image_id ,
-                    decider = "privateCloudConfig"
+                    image_id
                     ):
     
     connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
@@ -71,10 +68,10 @@ def boot_instances(conn,
         sleep(1)
     return connx
 
-def create_keypair(conn, keypair_name):
+def create_keypair(conn, keypair_name, key_dir = '/tmp'):
     
     keypair = conn.create_key_pair(keypair_name)
-    keypair.save(configParserHelper().get("commonConfig","DEFAULT_KEY_LOCATION"))
+    keypair.save(key_dir)
 
     # TODO - Save this keypair file in the mongodb
 

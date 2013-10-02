@@ -1,5 +1,3 @@
-from hadoopstack import config
-
 import hadoopstack
 import simplejson
     
@@ -9,12 +7,12 @@ from hadoopstack.dbOperations.db import flush_data_to_mongo
 from hadoopstack.services.configuration import configure_cluster
 from hadoopstack.services.configuration import configure_slave
 from hadoopstack.services import ec2
-from hadoopstack.services.make_config_parser import configParserHelper
+
 from bson import objectid
 
-def spawn(data,decider = "privateCloudConfig"):
-	 
-    image_id = configParserHelper().get(decider,"DEFAULT_IMAGE_ID")
+def spawn(data, cloud):
+
+    image_id = cloud['default_image_id']
 
     data['job']['nodes'] = []
     data['job']['status'] = 'spawning'
@@ -23,7 +21,7 @@ def spawn(data,decider = "privateCloudConfig"):
     job_name = data['job']['name']
     keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
 
-    conn = ec2.make_connection()
+    conn = ec2.make_connection(cloud)
     ec2.create_keypair(conn, keypair_name)
     ec2.create_security_groups(conn, sec_master, sec_slave)
 
@@ -35,8 +33,7 @@ def spawn(data,decider = "privateCloudConfig"):
         keypair_name,
         [sec_master],
         flavor = master['flavor'],
-		image_id = image_id,
-		decider = decider
+		image_id = image_id
         )
 
     data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
@@ -51,27 +48,29 @@ def spawn(data,decider = "privateCloudConfig"):
             keypair_name,
             [sec_slave],
             flavor = slave['flavor'],
-			image_id = image_id,
-			decider = decider
+			image_id = image_id
             )
         data['job']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
         flush_data_to_mongo('job', data)
 
     return
 
-def create(data,decider="privateCloudConfig"):
+def create(data, cloud):
 
     # TODO: We need to create an request-check/validation filter before inserting
 
-    spawn(data)
+    spawn(data, cloud)
     configure_cluster(data)
     
     return
 
-def delete(cid):
+def delete(cid, cloud):
+    """Delete a Job and associated cluster"""
+
     job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
-    conn = ec2.make_connection()
+
+    conn = ec2.make_connection(cloud)
 
     keypair = 'hadoopstack-' + job_name
     security_groups = ['hadoopstack-' + job_name + '-master', 
