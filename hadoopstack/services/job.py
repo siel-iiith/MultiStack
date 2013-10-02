@@ -1,4 +1,3 @@
-from hadoopstack import config
 from time import sleep
 from multiprocessing import Process
 from flask import make_response
@@ -28,7 +27,6 @@ def create(data):
     flush_data_to_mongo('job', data)
     
     if schedule(data, 'create'):
-        print "schedule.{0}".format(str(data))
         create_ret['job_id'] = id_t
         return make_response(jsonify(**create_ret), 202)
     else:
