@@ -100,5 +100,6 @@ def add(data, job_id):
 
 def remove(data, job_id):
 
-    Process(target = cluster.remove_nodes, args = (data, job_id)).start()
-    return make_response('', 202)
+    data['id'] = job_id
+    if schedule(data, "remove"):
+        return make_response('', 202)

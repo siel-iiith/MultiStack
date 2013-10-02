@@ -39,7 +39,7 @@ def schedule(data, operation):
         Process(target = cluster.delete, args = (job_id, cloud)).start()
         update_quota(data, cloud, operation)
 
-    elif operation == "add":
+    elif operation == 'add':
 
         job_id = data['id']
         job_obj = hadoopstack.services.job.info(job_id)
@@ -53,6 +53,21 @@ def schedule(data, operation):
 
         update_quota(job_obj, cloud, operation)
         Process(target = cluster.add_nodes, args = (data, cloud, job_id)).start()
+
+    elif operation == 'remove':
+
+        job_id = data['id']
+        job_obj = hadoopstack.services.job.info(job_id)
+
+        conf = config.read_conf()
+        for cloud in conf['clouds']:
+            if cloud['name'] == job_obj['job']['cloud']:
+                break
+
+        job_obj['job'] = data
+
+        Process(target = cluster.remove_nodes, args = (data, cloud, job_id)).start()
+        update_quota(job_obj, cloud, operation)
 
     return True
 
@@ -76,6 +91,12 @@ def update_quota(data, cloud, operation):
         cloud['quota']['available']['ram'] -= ram
         cloud['quota']['available']['vcpus'] -= vcpus
         cloud['quota']['available']['instances'] -= instances
+
+    if operation == 'remove':
+        ram, vcpus, instances = calculate_usage(cloud, data)
+        cloud['quota']['available']['ram'] += ram
+        cloud['quota']['available']['vcpus'] += vcpus
+        cloud['quota']['available']['instances'] += instances
 
     conf = config.read_conf()
     

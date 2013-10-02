@@ -170,9 +170,9 @@ def add_nodes(data, cloud, job_id):
     for new_node_obj in new_node_obj_list:
         configure_slave(new_node_obj['private_ip_address'], key_location, job_name)
 
-def remove_nodes(data, job_id):
+def remove_nodes(data, cloud, job_id):
 
-    conn = ec2.make_connection()
+    conn = ec2.make_connection(cloud['auth'])
 
     job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
