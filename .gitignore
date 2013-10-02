@@ -37,5 +37,6 @@ venv
 *.swp
 *.swo
 *.swn
+*.conf
 testconfig.py
 flavorConfig.py
