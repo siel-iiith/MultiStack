@@ -20,7 +20,7 @@ configure_chef_server() {
 		export no_proxy=localhost,127.0.0.1
 	fi
 
-	chef-server-ctl reconfigure
+	sudo chef-server-ctl reconfigure
 }
 
 configure_knife() {
@@ -28,7 +28,7 @@ configure_knife() {
 	mkdir $HOME/.chef
 	touch $HOME/.chef/knife.rb
 
-	knife configure -u $USER \
+	sudo -E knife configure -u $USER \
 	--validation-client-name chef-validator \
 	--validation-key /etc/chef-server/chef-validator.pem \
 	-s https://$chef_server_ip \
@@ -37,7 +37,7 @@ configure_knife() {
 	-c $HOME/.chef/knife.rb \
 	-y -r ''
 
-	knife user create \
+	sudo -E knife user create \
 	-a \
 	-s https://localhost \
 	-c $HOME/.chef/knife.rb \
