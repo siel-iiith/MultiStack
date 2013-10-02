@@ -1,0 +1,24 @@
+[DEFAULT]
+name=aws
+default_image_id=ami-xxxxxx
+
+# lower is better
+priority=1
+
+[auth]
+ec2_url=https://us-east-1.ec2.amazonaws.com
+ec2_access_key=xxxxxxxxxxxx
+ec2_secret_key=xxxxxxxxxxxxxxxxxx
+ec2_region=us-east-1
+
+[quota]
+instances=10
+vcpus=20
+ram=15000
+
+[flavors]
+# flavor=vcpu,ram
+t1.micro=1,613
+m1.small=1,1700
+m1.medium=2,3700
+m1.large=4,7500

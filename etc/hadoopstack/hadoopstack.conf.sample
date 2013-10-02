@@ -1,0 +1,12 @@
+[DEFAULT]
+DEFAULT_KEY_LOCATION=/tmp
+
+# Flask-PyMongo Configuration
+[flask]
+MONGO_HOST=
+MONGO_DBNAME=
+
+# Flask Configuration
+CSRF_ENABLED=True
+SECRET_KEY=you_know
+DEBUG=True
