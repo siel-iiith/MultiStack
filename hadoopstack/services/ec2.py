@@ -40,6 +40,15 @@ def make_connection(credentials):
     return conn
 
 def ec2_entities(job_name):
+    """
+    Returns the name of basic ec2_entities.
+    * Keypair name
+    * Security group for slaves
+    * Security group for master
+
+    @param job_name: User given name of the Job.
+    @type job_name: string
+    """
 
     keypair_name = "hadoopstack-" + job_name
     sec_slave = "hadoopstack-" + job_name + "-slave"
@@ -47,6 +56,8 @@ def ec2_entities(job_name):
     return keypair_name, sec_master, sec_slave
 
 def associate_public_ip(conn, instance_id):
+    """Associates public_ip with the instance"""
+
     for addr in conn.get_all_addresses():
         if addr.instance_id is '':
             addr.associate(instance_id)
@@ -57,6 +68,13 @@ def associate_public_ip(conn, instance_id):
     print "IP Associated:", addr.public_ip
 
 def release_public_ips(conn, public_ips_list):
+    """
+    Releases public_ips attached to the instances
+
+    @param public_ips_list: list of public public_ips
+    @type public_ips_list: list
+    """
+
     for addr in conn.get_all_addresses():
         if (addr.public_ip in public_ips_list) and addr.instance_id is None:
             addr.release()
@@ -68,7 +86,28 @@ def boot_instances(conn,
                     flavor,
                     image_id
                     ):
-    
+    """
+    Boot Instances
+
+    @param conn: EC2 connection object
+    @type conn: boto.ec2.connection.EC2Connection
+
+    @param number: number of instances to boot
+    @type number: int
+
+    @param keypair: Keypair name
+    @type keypair: string
+
+    @param security_groups: name of the security groups
+    @type security_groups: string
+
+    @param flavor: instance type
+    @type flavor: string
+
+    @type image_id: image-id
+    @type image_id: string
+    """
+
     connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
     
     while connx.instances[0].state == "pending":
@@ -79,13 +118,37 @@ def boot_instances(conn,
     return connx
 
 def create_keypair(conn, keypair_name, key_dir = '/tmp'):
-    
+    """
+    Creates keypair and saves it in key_dir directory
+
+    @param conn: EC2 connection object
+    @type conn: boto.ec2.connection.EC2Connection
+
+    @param keypair_name: Keypair name
+    @type keypair_name: string
+
+    @param key_dir: Destination folder of keypair
+    @type key_dir: string
+    """
+
     keypair = conn.create_key_pair(keypair_name)
     keypair.save(key_dir)
 
     # TODO - Save this keypair file in the mongodb
 
 def create_security_groups(conn, sec_master_name, sec_slave_name):
+    """
+    Creates Security groups.
+
+    @param conn: EC2 connection object
+    @type conn: boto.ec2.connection.EC2Connection
+
+    @param sec_master_name: Name of master's security group
+    @type sec_master_name: string
+
+    @param sec_slave_name: Name of slave's security group
+    @type sec_slave_name: string
+    """
 
     sec_slave = conn.create_security_group(sec_slave_name, "Security group for the slaves")
     sec_master = conn.create_security_group(sec_master_name, "Security group for the master")
