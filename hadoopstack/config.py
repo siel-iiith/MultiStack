@@ -78,7 +78,7 @@ def set_conf(conf_dir = "/etc/hadoopstack"):
     clouds = list()
 
     for cloud_file in listdir(cloud_dir):
-        if cloud_file.split('.')[1] == 'conf':
+        if cloud_file.split('.')[-1] == 'conf':
             clouds.append(parse_cloud_conf(join(cloud_dir, cloud_file)))
 
     conf['clouds'] = clouds
