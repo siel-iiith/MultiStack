@@ -66,7 +66,7 @@ def spawn(data, cloud):
 
     return
 
-def create(data, cloud):
+def create(data, cloud, general_config):
     """
     Creates the cluster - provisioning and configuration
 
@@ -76,12 +76,15 @@ def create(data, cloud):
     @param cloud: Cloud object containing information of a specific
     cloud provider.
     @type cloud: dict
+
+    @param general_config: General configuration parameters from hadoopstack.configure_slave
+    @type general_config: dict
     """
 
     # TODO: We need to create an request-check/validation filter before inserting
 
     spawn(data, cloud)
-    configure_cluster(data)
+    configure_cluster(data, cloud['user'], general_config)
     
     return
 

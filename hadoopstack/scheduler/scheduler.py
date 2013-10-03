@@ -25,7 +25,7 @@ def schedule(data, operation):
         db.flush_data_to_mongo('job', data)
 
         update_quota(data, cloud, operation)
-        Process(target = cluster.create, args = (data, cloud)).start()
+        Process(target = cluster.create, args = (data, cloud, conf['general'])).start()
 
     elif operation == 'delete':
 
