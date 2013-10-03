@@ -11,6 +11,12 @@ download_install_chef() {
 	sudo dpkg -i /tmp/chef-server.deb /tmp/chef-client.deb
 }
 
+setup_hostname() {
+	echo "chef.hadoopstack" | sudo /etc/hostname
+	sudo service hostname start
+	echo -e "127.0.0.1\t`hostname`" | sudo tee -a /etc/hosts
+}
+
 configure_chef_server() {
 
 	chef_server_ip=`ifconfig eth0 | grep -i 'inet '| cut -d ':' -f 2 | cut -d ' ' -f 1`
@@ -20,6 +26,10 @@ configure_chef_server() {
 		export no_proxy=localhost,127.0.0.1
 	fi
 
+
+	setup_hostname
+	#Disable WebUI
+	echo "chef_server_webui['enable'] = false" | sudo tee -a /etc/chef-server/chef-server.rb
 	sudo chef-server-ctl reconfigure
 }
 
