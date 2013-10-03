@@ -167,7 +167,7 @@ def list_clusters():
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
 
-def add_nodes(data, cloud, job_id):
+def add_nodes(data, cloud, job_id, general_config):
     """
     Add nodes to a cluster and updates the job object
 
@@ -180,6 +180,9 @@ def add_nodes(data, cloud, job_id):
 
     @param job_id: Job ID
     @type job_id: string
+
+    @param general_config: General config parameters of hadoopstack
+    @type general_config: dict
     """
 
     conn = ec2.make_connection(cloud['auth'])
@@ -214,7 +217,10 @@ def add_nodes(data, cloud, job_id):
         flush_data_to_mongo('job', job_db_item)
 
     for new_node_obj in new_node_obj_list:
-        configure_slave(new_node_obj['private_ip_address'], key_location, job_name)
+        configure_slave(new_node_obj['private_ip_address'],
+                        key_location, job_name, cloud['user'],
+                        general_config['chef_server_hostname'],
+                        general_config['chef_server_ip'])
 
 def remove_nodes(data, cloud, job_id):
     """

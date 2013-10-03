@@ -52,7 +52,7 @@ def schedule(data, operation):
         job_obj['job'] = data
 
         update_quota(job_obj, cloud, operation)
-        Process(target = cluster.add_nodes, args = (data, cloud, job_id)).start()
+        Process(target = cluster.add_nodes, args = (data, cloud, job_id, conf['general'])).start()
 
     elif operation == 'remove':
 
