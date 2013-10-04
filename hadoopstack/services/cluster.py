@@ -120,25 +120,27 @@ def delete(cid, cloud):
     print "Deleted keypairs"
 
     while True:
-        for sg in conn.get_all_security_groups():
-            if sg.name in security_groups:
+        try:
+            for sg in conn.get_all_security_groups(
+                                                groupnames = security_groups):
                 if len(sg.instances()) == 0:
-                    print "here"
                     sg.delete()
                     security_groups.remove(sg.name)
                 else:
-                    print "there"
                     all_dead = True
                     for instance in sg.instances():
                         if instance.state != 'terminated':
+                            # To stop code from requesting blindly
+                            sleep(2)
                             all_dead = False
 
                     if all_dead:
-                        print "here too"
                         sg.delete()
                         security_groups.remove(sg.name)
-        if len(security_groups) == 0:
-            break;
+            if len(security_groups) == 0:
+                break;
+        except:
+            break
 
     print "Deleted Security Groups"
 
@@ -147,6 +149,8 @@ def delete(cid, cloud):
 
     if len(public_ips) > 0:
         ec2.release_public_ips(conn, public_ips)
+
+    print "Released Elastic IPs"
 
     return True
 
