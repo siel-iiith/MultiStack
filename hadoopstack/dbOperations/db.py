@@ -11,6 +11,7 @@ def get_node_objects(conn, role, resv_id=None):
 				node = dict()
 				node['id'] = instance.id
 				node['private_ip_address'] = instance.private_ip_address
+				node['ip_address'] = instance.ip_address
 				node['reservation_id'] = resv_id
 				node['role'] = role
 				node['flavor'] = instance.instance_type

@@ -7,6 +7,8 @@ import paramiko
 from fabric.api import run
 from fabric.api import env
 
+from hadoopstack.services import ec2
+
 def ssh_check(instance_ip, key_location):
     '''
     Check if the ssh is up and running
@@ -71,41 +73,43 @@ def setup_chefserver_hostname(
     run("echo -e '{0}\t{1}' | sudo tee -a /etc/hosts".format(chef_server_ip,
                                                         chef_server_hostname))
 
-def configure_master(private_ip_address, key_location, job_name, user,
+def configure_master(ip_address, key_location, job_name, user,
                     chef_server_hostname, chef_server_ip):
 
-    if not ssh_check(private_ip_address, key_location):
-        print "Unable to ssh into master{0}. Aborting!!!".format(private_ip_address)
+    if not ssh_check(ip_address, key_location):
+        print "Unable to ssh into master{0}. Aborting!!!".format(ip_address)
         return False
 
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip,
-                            private_ip_address, user, key_location)
+                            ip_address, user, key_location)
 
     subprocess.call(("knife bootstrap {0} -x {1} -i {2} \
         -N {3}-master --sudo -r 'recipe[hadoopstack::master]' \
-        --no-host-key-verify".format(private_ip_address, user,
+        --no-host-key-verify".format(ip_address, user,
          key_location, job_name)).split())
 
     return True
 
-def configure_slave(private_ip_address, key_location, job_name, user,
+def configure_slave(ip_address, key_location, job_name, user,
                     chef_server_hostname, chef_server_ip):
 
-    if not ssh_check(private_ip_address, key_location):
-        print "Unable to ssh into node {0}. Skipping it".format(private_ip_address)
+    if not ssh_check(ip_address, key_location):
+        print "Unable to ssh into node {0}. Skipping it".format(ip_address)
         return False
 
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip,
-                            private_ip_address, user, key_location)
+                            ip_address, user, key_location)
 
     subprocess.call((
         "knife bootstrap {0} -x {1} -i {2} \
         -N {3}-slave-{4} --sudo -r 'recipe[hadoopstack::slave]' \
-        --no-host-key-verify".format(private_ip_address,
+        --no-host-key-verify".format(ip_address,
             user, key_location, job_name,
             str(random.random()).split('.')[1])
         ).split()
     )
+
+    ec2.release_public_ip()
 
     return True
 
@@ -121,15 +125,15 @@ def configure_cluster(data, user, general_config):
     for node in data['job']['nodes']:
 
         if node['role'] == 'master':
-            if not configure_master(node['private_ip_address'], key_location, job_name, user,
+            if not configure_master(node['ip_address'], key_location, job_name, user,
                                 general_config['chef_server_hostname'],
                                 general_config['chef_server_ip']):
                 return False
 
         elif node['role'] == 'slave':
             setup_chefserver_hostname(general_config['chef_server_hostname'], general_config['chef_server_ip'],
-                                    node['private_ip_address'], user, key_location)
-            configure_slave(node['private_ip_address'], key_location, job_name, user,
+                                    node['ip_address'], user, key_location)
+            configure_slave(node['ip_address'], key_location, job_name, user,
                                 general_config['chef_server_hostname'],
                                 general_config['chef_server_ip'])
 
