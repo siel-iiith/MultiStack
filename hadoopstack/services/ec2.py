@@ -98,7 +98,7 @@ def boot_instances(conn,
     @param keypair: Keypair name
     @type keypair: string
 
-    @param security_groups: name of the security groups
+    @param security_groups: name of the security security_groups
     @type security_groups: string
 
     @param flavor: instance type
@@ -108,14 +108,15 @@ def boot_instances(conn,
     @type image_id: string
     """
 
-    connx = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
+    reservation = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
     
-    while connx.instances[0].state == "pending":
-        for res in conn.get_all_instances():
-            if res.id == connx.id:
-                connx = res
-        sleep(1)
-    return connx
+    for instance in reservation.instances:
+        while instance.status == 'pending':
+            sleep(1)
+            print "waiting for instance status to update"
+            instance.update()
+
+    return reservation
 
 def create_keypair(conn, keypair_name, key_dir = '/tmp'):
     """
