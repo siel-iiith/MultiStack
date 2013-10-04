@@ -111,7 +111,7 @@ def boot_instances(conn,
     reservation = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
     
     for instance in reservation.instances:
-        while instance.status == 'pending':
+        while instance.state == 'pending':
             sleep(1)
             print "waiting for instance status to update"
             instance.update()
