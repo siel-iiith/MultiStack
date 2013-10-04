@@ -116,6 +116,8 @@ def boot_instances(conn,
             print "waiting for instance status to update"
             instance.update()
 
+        associate_public_ip(conn, instance.id)
+
     return reservation
 
 def create_keypair(conn, keypair_name, key_dir = '/tmp'):

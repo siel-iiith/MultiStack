@@ -50,8 +50,6 @@ def spawn(data, cloud):
     data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
     flush_data_to_mongo('job', data)
 
-    ec2.associate_public_ip(conn, res_master.instances[0].id)
-
     for slave in data['job']['slaves']:
         res_slave = ec2.boot_instances(
             conn,
