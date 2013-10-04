@@ -109,8 +109,6 @@ def configure_slave(ip_address, key_location, job_name, user,
         ).split()
     )
 
-    ec2.release_public_ip()
-
     return True
 
 def configure_cluster(data, user, general_config):
