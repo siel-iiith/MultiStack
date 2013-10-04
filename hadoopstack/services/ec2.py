@@ -75,8 +75,8 @@ def release_public_ips(conn, public_ips_list):
     @type public_ips_list: list
     """
 
-    for addr in conn.get_all_addresses():
-        if (addr.public_ip in public_ips_list) and addr.instance_id is None:
+    for addr in conn.get_all_addresses(addresses = public_ips_list):
+        if addr.instance_id is None:
             addr.disassociate()
             addr.release()
 
