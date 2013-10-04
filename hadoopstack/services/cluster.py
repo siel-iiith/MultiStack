@@ -103,61 +103,52 @@ def delete(cid, cloud):
 
     conn = ec2.make_connection(cloud['auth'])
 
-    keypair = 'hadoopstack-' + job_name
-    security_groups = ['hadoopstack-' + job_name + '-master', 
-        'hadoopstack-' + job_name + '-slave']
+    keypair, sec_grp_master, sec_grp_slave = ec2.ec2_entities(job_name)
+    security_groups = [sec_grp_master, sec_grp_slave]
+    public_ips = list()
 
-    '''
-    
-    Instances take a while to terminate, till then their status is
-    'shutting-down'. Complete termination is required for deletion  of
-    Security Groups. Hence, we use a loop to verify complete termination.
-
-    '''
-    
-    flag = True
-    public_ips = []
-
-    while flag:
-        flag = False
-        for res in conn.get_all_instances():
-            for instance in res.instances:
-                for node in job_info['nodes']:
-                    if instance.id == str(node['id']):
-                        try:
-                            if instance.ip_address != instance.private_ip_address:
-                                if instance.ip_address not in public_ips:
-                                    public_ips.append(str(instance.ip_address))
-                            instance.terminate()
-                        except:
-                            pass
-                        flag = True
-                        continue
-
+    for res in conn.get_all_instances():
+        for instance in res.instances:
+            for node in job_info['nodes']:
+                if instance.id == str(node['id']):
+                    instance.terminate()
     print "Terminated Instances"
 
-    try:
-        for kp in conn.get_all_key_pairs(keynames = [keypair]):
+    for kp in conn.get_all_key_pairs():
+        if kp.name == keypair:
             kp.delete()
+    print "Deleted keypairs"
 
-        print "Terminated keypairs"
+    while True:
+        for sg in conn.get_all_security_groups():
+            if sg.name in security_groups:
+                if len(sg.instances()) == 0:
+                    print "here"
+                    sg.delete()
+                    security_groups.remove(sg.name)
+                else:
+                    print "there"
+                    all_dead = True
+                    for instance in sg.instances():
+                        if instance.state != 'terminated':
+                            all_dead = False
 
-    except:
-        print "Error while deleting Keypair"
+                    if all_dead:
+                        print "here too"
+                        sg.delete()
+                        security_groups.remove(sg.name)
+        if len(security_groups) == 0:
+            break;
 
-    try:
-        for sg in conn.get_all_security_groups(groupnames = security_groups):
-            print sg.delete() 
-        
-        print "Terminated Security Groups"
+    print "Deleted Security Groups"
 
-    except:
-        print "Error while deleting Security Groups"
+    for node in job_info['nodes']:
+        public_ips.append(node['ip_address'])
 
-    ec2.release_public_ips(conn, public_ips)
+    if len(public_ips) > 0:
+        ec2.release_public_ips(conn, public_ips)
 
     return True
-
 
 def list_clusters():
     clusters_dict = {"clusters": []}
