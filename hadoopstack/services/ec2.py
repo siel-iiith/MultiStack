@@ -77,7 +77,6 @@ def release_public_ips(conn, public_ips_list):
 
     for addr in conn.get_all_addresses(addresses = public_ips_list):
         if addr.instance_id == '':
-            addr.disassociate()
             addr.release()
 
 def boot_instances(conn, 
