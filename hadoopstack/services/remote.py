@@ -1,5 +1,6 @@
 from fabric.api import env
 from fabric.api import run
+from fabric.api import sudo
 
 class Remote:
     """
@@ -23,21 +24,31 @@ class Remote:
         self.address = address
         self.user = user
         self.key = key_location
-
-        env.host_string = address
-        env.key_filename = key_location
-        env.user = user
-        env.disable_known_hosts=True
-
         self.env = env
 
-    def execute(self, command):
+    def run(self, command):
         """
-        Execute a command on the remote host
+        Execute a command on the remote host as self.user
 
         @param  command: Command to be executed
         @type   command: C{str}
         """
+        env.host_string = self.address
+        env.key_filename = self.key
+        env.user = self.user
+        env.disable_known_hosts=True
 
-        env = self.env
-        return run(command)
+        return  run(command)
+
+    def sudo(self, command, user=None):
+        """
+        Executes command on the remote host using sudo as user
+
+        @param  command: Command to be executed
+        @type   command: C{str}
+
+        @param  user: User on whose behalf the command will be executed
+        @type   user: C{str}
+        """
+
+        return sudo(command, user=user)
