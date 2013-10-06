@@ -54,7 +54,7 @@ def setup_chefserver_hostname(
     @type remote: remote.Remote instance
     """
 
-    remote.execute("echo -e '{0}\t{1}' | sudo tee -a /etc/hosts".format(
+    remote.run("echo -e '{0}\t{1}' | sudo tee -a /etc/hosts".format(
                                     chef_server_ip, chef_server_hostname))
 
 def configure_master(ip_address, key_location, job_name, user,
