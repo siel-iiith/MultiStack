@@ -24,7 +24,6 @@ class Remote:
         self.address = address
         self.user = user
         self.key = key_location
-        self.env = env
 
     def run(self, command):
         """
@@ -40,7 +39,7 @@ class Remote:
 
         return  run(command)
 
-    def sudo(self, command, user=None):
+    def sudo(self, command, user=None, pty=False):
         """
         Executes command on the remote host using sudo as user
 
@@ -50,5 +49,9 @@ class Remote:
         @param  user: User on whose behalf the command will be executed
         @type   user: C{str}
         """
+        env.host_string = self.address
+        env.key_filename = self.key
+        env.user = self.user
+        env.disable_known_hosts=True
 
-        return sudo(command, user=user)
+        return sudo(command, user=user, pty=False)
