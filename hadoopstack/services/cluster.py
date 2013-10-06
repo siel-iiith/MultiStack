@@ -210,7 +210,7 @@ def add_nodes(data, cloud, job_id, general_config):
         flush_data_to_mongo('job', job_db_item)
 
     for new_node_obj in new_node_obj_list:
-        configure_slave(new_node_obj['private_ip_address'],
+        configure_slave(new_node_obj['ip_address'],
                         key_location, job_name, cloud['user'],
                         general_config['chef_server_hostname'],
                         general_config['chef_server_ip'])
