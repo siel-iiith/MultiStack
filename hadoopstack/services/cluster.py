@@ -9,6 +9,7 @@ from hadoopstack.dbOperations.db import flush_data_to_mongo
 from hadoopstack.services.configuration import configure_cluster
 from hadoopstack.services.configuration import configure_slave
 from hadoopstack.services import ec2
+from hadoopstack.services.run import submit_job
 
 def spawn(data, cloud):
     """
@@ -83,6 +84,7 @@ def create(data, cloud, general_config):
 
     spawn(data, cloud)
     configure_cluster(data, cloud['user'], general_config)
+    submit_job(data, cloud['user'], cloud['auth'])
     
     return
 
