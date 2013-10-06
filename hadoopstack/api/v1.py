@@ -35,7 +35,10 @@ def jobs_api():
 def job_api(job_id):
 
     if request.method == "GET":
-        return jsonify(job.info(job_id))
+        if job.info(job_id)[0]:
+            return jsonify(job.info(job_id)[1])
+        else:
+            return job.info(job_id)[1]
 
     elif request.method == "DELETE":
         return job.delete(job_id)

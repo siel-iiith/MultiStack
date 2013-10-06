@@ -63,26 +63,26 @@ def validate(data):
 
 def delete(job_id):
 
-    job = info(job_id)
-
-    if (
-        job['job']['status'] != 'terminated' and
-        job['job']['status'] != 'completed'
-        ):
-        
-        if schedule(job, "delete"):
-            return make_response('', 204)
-
-        return make_response('JOB_TERMINATION_FAILED', 500)
-
+    if info(job_id)[0]:
+        job = info(job_id)[1]
     else:
         return make_response("JOB_NOT_FOUND", 412)
 
+    if schedule(job, "delete"):
+        return make_response('', 204)
+
+    else:
+        return make_response('JOB_TERMINATION_FAILED', 500)
+
 def info(job_id):
 
-    job_info = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
-    job_info.pop('_id')
-    return job_info
+    try:
+        job_info = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+        job_info.pop('_id')
+        return True, job_info
+
+    except:
+        return False, make_response("JOB_NOT_FOUND", 412)
 
 def job_list():
 
