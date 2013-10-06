@@ -1,14 +1,14 @@
-import hadoopstack
 import simplejson
+import sys
+from bson import objectid
+from time import sleep
     
+import hadoopstack
 from hadoopstack.dbOperations.db import get_node_objects
 from hadoopstack.dbOperations.db import flush_data_to_mongo
-
 from hadoopstack.services.configuration import configure_cluster
 from hadoopstack.services.configuration import configure_slave
 from hadoopstack.services import ec2
-
-from bson import objectid
 
 def spawn(data, cloud):
     """
@@ -138,11 +138,11 @@ def delete(cid, cloud):
                         sg.delete()
                         security_groups.remove(sg.name)
             if len(security_groups) == 0:
+                print "Deleted Security Groups"
                 break;
         except:
+            print "Error:", sys.exc_info()[0]
             break
-
-    print "Deleted Security Groups"
 
     for node in job_info['nodes']:
         public_ips.append(node['ip_address'])
