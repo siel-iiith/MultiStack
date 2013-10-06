@@ -4,10 +4,9 @@ import random
 from time import sleep
 
 import paramiko
-from fabric.api import run
-from fabric.api import env
 
 from hadoopstack.services import ec2
+from hadoopstack.services.remote import Remote
 
 def ssh_check(instance_ip, key_location):
     '''
@@ -40,9 +39,7 @@ def ssh_check(instance_ip, key_location):
 def setup_chefserver_hostname(
         chef_server_hostname,
         chef_server_ip,
-        remote_host_addr,
-        remote_user,
-        key_location
+        remote
         ):
     """
     Setup a static host resolution entry of chefserver in /etc/hosts
@@ -53,25 +50,12 @@ def setup_chefserver_hostname(
     @param chef_server_ip: IP address of the chef server
     @type chef_server_ip: string
 
-    @param remote_host_addr: IP address of the remote host on which
-    host resolution is to be configured.
-    @type remote_host_addr: string
-
-    @param remote_user: user of the remote machine
-    @type remote_user: string
-
-    @param key_location: Location of the private key_location
-    @type key_location: string
-
+    @param remote: Instance of remote.Remote class
+    @type remote: remote.Remote instance
     """
 
-    env.host_string = remote_host_addr
-    env.key_filename = key_location
-    env.user = remote_user
-    env.disable_known_hosts=True
-
-    run("echo -e '{0}\t{1}' | sudo tee -a /etc/hosts".format(chef_server_ip,
-                                                        chef_server_hostname))
+    remote.execute("echo -e '{0}\t{1}' | sudo tee -a /etc/hosts".format(
+                                    chef_server_ip, chef_server_hostname))
 
 def configure_master(ip_address, key_location, job_name, user,
                     chef_server_hostname, chef_server_ip):
@@ -80,8 +64,9 @@ def configure_master(ip_address, key_location, job_name, user,
         print "Unable to ssh into master{0}. Aborting!!!".format(ip_address)
         return False
 
-    setup_chefserver_hostname(chef_server_hostname, chef_server_ip,
-                            ip_address, user, key_location)
+    remote = Remote(ip_address, user, key_location)
+
+    setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
     subprocess.call(("knife bootstrap {0} -x {1} -i {2} \
         -N {3}-master --sudo -r 'recipe[hadoopstack::master]' \
@@ -97,8 +82,9 @@ def configure_slave(ip_address, key_location, job_name, user,
         print "Unable to ssh into node {0}. Skipping it".format(ip_address)
         return False
 
-    setup_chefserver_hostname(chef_server_hostname, chef_server_ip,
-                            ip_address, user, key_location)
+    remote = Remote(ip_address, user, key_location)
+
+    setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
     subprocess.call((
         "knife bootstrap {0} -x {1} -i {2} \
@@ -129,8 +115,6 @@ def configure_cluster(data, user, general_config):
                 return False
 
         elif node['role'] == 'slave':
-            setup_chefserver_hostname(general_config['chef_server_hostname'], general_config['chef_server_ip'],
-                                    node['ip_address'], user, key_location)
             configure_slave(node['ip_address'], key_location, job_name, user,
                                 general_config['chef_server_hostname'],
                                 general_config['chef_server_ip'])
