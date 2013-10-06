@@ -16,7 +16,7 @@ create()
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "{\"job\":{\"name\":\"$RANDOM\",\"jar\":\"file_mapped.jar\",\"deadline\":\"16/06/2013\",\"input\":\"s3://\",\"output\":\"s3://\",\"master\": {\"flavor\":\"t1.micro\"},\"slaves\": [{\"flavor\":\"t1.micro\",\"instances\":1},{\"flavor\":\"m1.small\",\"instances\":1}]}}" \
+    --data "{\"job\":{\"name\":\"$RANDOM\",\"jar\":\"s3://sieljars/hadoop-examples-1.1.2.jar\",\"args\":\"wordcount\",\"deadline\":\"16/06/2013\",\"input\":\"s3://hsinput\",\"output\":\"s3://hsoutput\",\"master\": {\"flavor\":\"m1.small\"},\"slaves\": [{\"flavor\":\"m1.medium\",\"instances\":1}]}}" \
     http://localhost:5000/v1/jobs
 
 }
@@ -37,7 +37,7 @@ add()
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "{\"slaves\": [{\"flavor\":\"t1.micro\",\"instances\":1}, {\"flavor\":\"m1.small\",\"instances\":1}]}" \
+    --data "{\"slaves\": [{\"flavor\":\"m1.small\",\"instances\":1}, {\"flavor\":\"m1.medium\",\"instances\":1}]}" \
     http://localhost:5000/v1/jobs/$1/add
 }
 
@@ -47,7 +47,7 @@ rm()
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "{\"slaves\": [{\"flavor\":\"t1.micro\",\"instances\":1}, {\"flavor\":\"m1.small\",\"instances\":1}]}" \
+    --data "{\"slaves\": [{\"flavor\":\"m1.small\",\"instances\":1}, {\"flavor\":\"m1.medium\",\"instances\":1}]}" \
     http://localhost:5000/v1/jobs/$1/rm
 }
 
