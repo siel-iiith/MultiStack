@@ -42,32 +42,40 @@ def schedule(data, operation):
     elif operation == 'add':
 
         job_id = data['id']
-        job_obj = hadoopstack.services.job.info(job_id)
+        if hadoopstack.services.job.info(job_id)[0]:
+            job_obj = hadoopstack.services.job.info(job_id)[1]
+        else:
+            return False
 
         conf = config.read_conf()
         for cloud in conf['clouds']:
             if cloud['name'] == job_obj['job']['cloud']:
                 break
 
-        job_obj['job'] = data
+        new_req_obj = dict()
+        new_req_obj['job'] = data
 
-        update_quota(job_obj, cloud, operation)
+        update_quota(new_req_obj, cloud, operation)
         Process(target = cluster.add_nodes, args = (data, cloud, job_id, conf['general'])).start()
 
     elif operation == 'remove':
 
         job_id = data['id']
-        job_obj = hadoopstack.services.job.info(job_id)
+        if hadoopstack.services.job.info(job_id)[0]:
+            job_obj = hadoopstack.services.job.info(job_id)[1]
+        else:
+            return False
 
         conf = config.read_conf()
         for cloud in conf['clouds']:
             if cloud['name'] == job_obj['job']['cloud']:
                 break
 
-        job_obj['job'] = data
+        new_req_obj = dict()
+        new_req_obj['job'] = data
 
         Process(target = cluster.remove_nodes, args = (data, cloud, job_id)).start()
-        update_quota(job_obj, cloud, operation)
+        update_quota(new_req_obj, cloud, operation)
 
     return True
 
