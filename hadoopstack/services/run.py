@@ -102,14 +102,16 @@ def submit_job(data, user, credentials):
         if node['role'] == 'master':
             remote = Remote(node['ip_address'], user, key_location)
 
-    bucket_name = data['job']['input'].split('/')[2]
-    setup_s3fs(credentials, remote)
-    mount_bucket(bucket_name, remote)
-    copy_to_hdfs(data['job']['input'], remote)
+    if data['job']['input'] != 's3://':
+        bucket_name = data['job']['input'].split('/')[2]
+        setup_s3fs(credentials, remote)
+        mount_bucket(bucket_name, remote)
+        copy_to_hdfs(data['job']['input'], remote)
+
     run_job(
-            data['job']['jar'],
-            data['job']['args'],
-            data['job']['input'],
-            data['job']['output'],
-            remote
-            )
+        data['job']['jar'],
+        data['job']['args'],
+        data['job']['input'],
+        data['job']['output'],
+        remote
+        )
