@@ -4,6 +4,7 @@ import random
 from time import sleep
 
 import paramiko
+from flask import current_app
 
 from hadoopstack.services import ec2
 from hadoopstack.services.remote import Remote
@@ -68,10 +69,14 @@ def configure_master(ip_address, key_location, job_name, user,
 
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
-    subprocess.call(("knife bootstrap {0} -x {1} -i {2} \
-        -N {3}-master --sudo -r 'recipe[hadoopstack::master]' \
-        --no-host-key-verify".format(ip_address, user,
-         key_location, job_name)).split())
+    out = subprocess.Popen(("knife bootstrap {0} -x {1} -i {2} \
+            -N {3}-master --sudo -r 'recipe[hadoopstack::master]' \
+            --no-host-key-verify".format(ip_address, user,
+            key_location, job_name)).split(),
+            stdout = subprocess.PIPE
+            )
+    for line in out.communicate()[0].split('\n'):
+        current_app.logger.info(line)
 
     return True
 
@@ -86,14 +91,17 @@ def configure_slave(ip_address, key_location, job_name, user,
 
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
-    subprocess.call((
+    out = subprocess.Popen((
         "knife bootstrap {0} -x {1} -i {2} \
         -N {3}-slave-{4} --sudo -r 'recipe[hadoopstack::slave]' \
         --no-host-key-verify".format(ip_address,
             user, key_location, job_name,
             str(random.random()).split('.')[1])
-        ).split()
+        ).split(),
+        stdout = subprocess.PIPE
     )
+    for line in out.communicate()[0].split('\n'):
+        current_app.logger.info(line)
 
     return True
 
