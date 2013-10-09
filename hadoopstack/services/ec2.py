@@ -2,6 +2,7 @@ from time import sleep
 
 from boto.ec2.connection import EC2Connection
 from boto.ec2.regioninfo import EC2RegionInfo
+from flask import current_app
 
 def make_connection(credentials):
     """
@@ -65,7 +66,7 @@ def associate_public_ip(conn, instance_id):
 
     addr = conn.allocate_address()
     addr.associate(instance_id)
-    print "IP Associated:", addr.public_ip
+    current_app.logger.info("IP Associated: {0}".format(addr.public_ip))
 
 def release_public_ips(conn, public_ips_list):
     """
@@ -113,7 +114,7 @@ def boot_instances(conn,
     for instance in reservation.instances:
         while instance.state == 'pending':
             sleep(4)
-            print "waiting for instance status to update"
+            current_app.logger.info("waiting for instance status to update")
             instance.update()
 
         associate_public_ip(conn, instance.id)

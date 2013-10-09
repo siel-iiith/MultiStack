@@ -16,7 +16,7 @@ def ssh_check(instance_ip, key_location):
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
+
     while(True):
         try:
             ssh.connect(hostname=instance_ip,
@@ -25,11 +25,11 @@ def ssh_check(instance_ip, key_location):
         
         except socket.error, (value, message):
             if value == 113 or 111:
-                print "checking for ssh..."
+                current_app.logger.info("checking for ssh...")
                 sleep(1)
                 continue
             else:
-                print "socket.error: [Errno", value, "]", message
+                current_app.logger.error("socket.error: [Errno {0}] {1}".format(value, message))
 
         except paramiko.SSHException:
             print "paramiko.error: connection refused. Discarding instance"

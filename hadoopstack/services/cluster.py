@@ -2,6 +2,8 @@ import simplejson
 import sys
 from bson import objectid
 from time import sleep
+
+from flask import current_app
     
 import hadoopstack
 from hadoopstack.dbOperations.db import get_node_objects
@@ -82,6 +84,7 @@ def create(data, cloud, general_config):
 
     # TODO: We need to create an request-check/validation filter before inserting
 
+    current_app.logger.info('creating')
     spawn(data, cloud)
     configure_cluster(data, cloud['user'], general_config)
     submit_job(data, cloud['user'], cloud['auth'])
@@ -100,6 +103,8 @@ def delete(cid, cloud):
     @type cloud: dict
     """
 
+    current_app.logger.info('deleting')
+
     job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
 
@@ -114,12 +119,12 @@ def delete(cid, cloud):
             for node in job_info['nodes']:
                 if instance.id == str(node['id']):
                     instance.terminate()
-    print "Terminated Instances"
+    current_app.logger.info("Terminated Instances")
 
     for kp in conn.get_all_key_pairs():
         if kp.name == keypair:
             kp.delete()
-    print "Deleted keypairs"
+    current_app.logger.info("Deleted Keypairs")
 
     while True:
         try:
@@ -140,10 +145,10 @@ def delete(cid, cloud):
                         sg.delete()
                         security_groups.remove(sg.name)
             if len(security_groups) == 0:
-                print "Deleted Security Groups"
+                current_app.logger.info("Deleted Security Groups")
                 break;
         except:
-            print "Error:", sys.exc_info()[0]
+            current_app.logger.error("Error:".format(sys.exc_info()[0]))
             break
 
     for node in job_info['nodes']:
@@ -152,7 +157,7 @@ def delete(cid, cloud):
     if len(public_ips) > 0:
         ec2.release_public_ips(conn, public_ips)
 
-    print "Released Elastic IPs"
+    current_app.logger.info("Released Elastic IPs")
 
     return True
 
