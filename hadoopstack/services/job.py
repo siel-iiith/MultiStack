@@ -1,12 +1,15 @@
-from time import sleep
 from multiprocessing import Process
-from flask import make_response
-from flask import jsonify
-
-import hadoopstack
+from time import sleep
+import logging
 import simplejson
 
+from flask import make_response
+from flask import jsonify
+from flask import current_app
+
+import hadoopstack
 from hadoopstack.dbOperations.db import flush_data_to_mongo
+from hadoopstack.log import set_prefixed_format
 from hadoopstack.scheduler.scheduler import schedule
 import hadoopstack.services.cluster as cluster
 
@@ -25,7 +28,9 @@ def create(data):
     id_t = str(data['_id'])
     data['job']['id'] = id_t
     flush_data_to_mongo('job', data)
-    
+
+    set_prefixed_format(id_t)
+
     if schedule(data, 'create'):
         create_ret['job_id'] = id_t
         return make_response(jsonify(**create_ret), 202)
@@ -63,6 +68,8 @@ def validate(data):
 
 def delete(job_id):
 
+    set_prefixed_format(job_id)
+
     if info(job_id)[0]:
         job = info(job_id)[1]
     else:
@@ -95,11 +102,13 @@ def job_list():
 def add(data, job_id):
 
     data['id'] = job_id
+    set_prefixed_format(job_id)
     if schedule(data, "add"):
         return make_response('', 202)
 
 def remove(data, job_id):
 
     data['id'] = job_id
+    set_prefixed_format(job_id)
     if schedule(data, "remove"):
         return make_response('', 202)
