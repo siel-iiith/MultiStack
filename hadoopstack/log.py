@@ -1,6 +1,8 @@
 import logging
 import StringIO
 
+from flask import current_app
+
 class LogStream(StringIO.StringIO):
 
     def add_logger(self, logger):
