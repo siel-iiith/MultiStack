@@ -2,6 +2,10 @@ from fabric.api import env
 from fabric.api import run
 from fabric.api import sudo
 
+from flask import current_app
+
+from hadoopstack.log import LogStream
+
 class Remote:
     """
     A class to handle ssh communications with remote systems.
@@ -24,6 +28,8 @@ class Remote:
         self.address = address
         self.user = user
         self.key = key_location
+        self.logstream = LogStream()
+        self.logstream.add_logger(current_app.logger)
 
     def run(self, command):
         """
@@ -37,7 +43,7 @@ class Remote:
         env.user = self.user
         env.disable_known_hosts=True
 
-        return  run(command)
+        return  run(command, stdout = self.logstream, stderr = self.logstream)
 
     def sudo(self, command, user=None, pty=False):
         """
@@ -54,4 +60,4 @@ class Remote:
         env.user = self.user
         env.disable_known_hosts=True
 
-        return sudo(command, user=user, pty=False)
+        return sudo(command, user=user, pty=False, stdout = self.logstream, stderr = self.logstream)
