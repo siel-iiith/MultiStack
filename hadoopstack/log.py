@@ -1,15 +1,16 @@
 import logging
 import StringIO
 
-from flask import current_app
+class LogStream(StringIO.StringIO):
 
-class MyStream(StringIO.StringIO):
+    def add_logger(self, logger):
+        self.logger = logger
 
     def write(self, data):
         """
         write string to logger
         """
-        current_app.logger.info(data)
+        self.logger.info(data)
 
 def set_prefixed_format(prefix):
     """
