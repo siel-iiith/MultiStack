@@ -18,12 +18,5 @@ def set_prefixed_format(prefix):
     """
 
     formatter = logging.Formatter("{0} - %(message)s".format(prefix))
-    handler = logging.handlers.SysLogHandler(address = '/dev/log')
-    handler.setFormatter(formatter)
-
-    # This step removes the previous SysLogHandler in the list. If not
-    # removed, multiple log messages will be logged with different
-    # prefixes.
-
-    current_app.logger.handlers.pop()
-    current_app.logger.addHandler(handler)
+    # Updating the formatter of SysLogHandler
+    handler = current_app.logger.handlers[-1].setFormatter(formatter)
