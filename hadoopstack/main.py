@@ -14,7 +14,7 @@ app.config['DEBUG'] = True
 
 if configparser.has_option('DEFAULT', 'syslog_server_ip'):
 	app.syslog_address = (configparser.get('DEFAULT', 'syslog_server_ip'),
-						configparser.get('DEFAULT', 'syslog_server_port'))
+						int(configparser.get('DEFAULT', 'syslog_server_port')))
 else:
 	app.syslog_address = '/dev/log'
 
