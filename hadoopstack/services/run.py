@@ -51,12 +51,35 @@ def copy_to_hdfs(input_uri, remote):
     @param  input_uri: s3 address - s3://bucket/path/to/input/dir
     @type   input_uri: C{str}
     """
+
     bucket_name = input_uri.split('/')[2]
     input_path = input_uri.split('//')[1]
 
     remote.sudo("hadoop fs -mkdir tmp", user='mapred')
     remote.sudo("hadoop fs -copyFromLocal /media/{0}/ .".format(input_path),
         user='mapred')
+
+def copy_to_s3(output_uri, input_uri, remote):
+    """
+    Copy the output stored at base directory of output_uri
+
+    @param  output_uri: s3 address - s3://bucket/path/to/output/dir
+    @type   output_uri: C{str}
+
+    @param  input_uri: s3 address - s3://bucket/path/to/input/dir
+    @type   input_uri: C{str}
+    """
+
+    input_bucket = input_uri.split('/')[2]
+    output_bucket = output_uri.split('/')[2]
+    if input_bucket != output_bucket:
+        mount_bucket(output_bucket, remote)
+
+    output_dir = output_uri.split('/')[-1]
+    output_path = output_uri.split('//')[1]
+
+    remote.sudo("hadoop fs -copyToLocal {0}/* /media/{1}".format(output_dir, 
+            output_path), user = 'mapred')
 
 def download_jar(jar_location, remote):
     """
@@ -115,3 +138,5 @@ def submit_job(data, user, credentials):
         data['job']['output'],
         remote
         )
+
+    copy_to_s3(data['job']['output'], data['job']['input'], remote)
