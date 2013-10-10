@@ -6,8 +6,6 @@ from flask import current_app
 
 from hadoopstack.log import LogStream
 
-SSH_TIMEOUT = 60
-
 class Remote:
     """
     A class to handle ssh communications with remote systems.
@@ -43,10 +41,10 @@ class Remote:
         env.host_string = self.address
         env.key_filename = self.key
         env.user = self.user
-        env.disable_known_hosts=True
+        env.disable_known_hosts = True
+        env.connection_attempts = 3
 
-        return  run(command, stdout = self.logstream, stderr = self.logstream,
-                timeout = SSH_TIMEOUT)
+        return  run(command, stdout = self.logstream, stderr = self.logstream)
 
     def sudo(self, command, user=None, pty=False):
         """
@@ -61,7 +59,7 @@ class Remote:
         env.host_string = self.address
         env.key_filename = self.key
         env.user = self.user
-        env.disable_known_hosts=True
+        env.disable_known_hosts = True
+        env.connection_attempts = 3
 
-        return sudo(command, user=user, pty=False, stdout = self.logstream,
-                stderr = self.logstream, timeout = SSH_TIMEOUT)
+        return sudo(command, user=user, pty=False, stdout = self.logstream, stderr = self.logstream)
