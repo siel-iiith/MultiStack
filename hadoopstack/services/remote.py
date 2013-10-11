@@ -1,10 +1,10 @@
 from fabric.api import env
 from fabric.api import run
 from fabric.api import sudo
-
 from flask import current_app
 
 from hadoopstack.log import LogStream
+from hadoopstack.constants import *
 
 class Remote:
     """
@@ -42,7 +42,8 @@ class Remote:
         env.key_filename = self.key
         env.user = self.user
         env.disable_known_hosts = True
-        env.connection_attempts = 3
+        env.connection_attempts = SSH_ATTEMPTS
+        env.timeout = SSH_TIMEOUT
 
         return  run(command, stdout = self.logstream, stderr = self.logstream)
 
@@ -60,6 +61,7 @@ class Remote:
         env.key_filename = self.key
         env.user = self.user
         env.disable_known_hosts = True
-        env.connection_attempts = 3
+        env.connection_attempts = SSH_ATTEMPTS
+        env.timeout = SSH_TIMEOUT
 
         return sudo(command, user=user, pty=False, stdout = self.logstream, stderr = self.logstream)
