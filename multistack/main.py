@@ -3,8 +3,8 @@ import logging
 from flask import Flask
 from flask.ext.pymongo import PyMongo
 
-from hadoopstack import config
-from hadoopstack.api.v1 import app_v1
+from multistack import config
+from multistack.api.v1 import app_v1
 
 app = Flask(__name__)
 configparser = config.config_parser()

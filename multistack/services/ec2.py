@@ -51,9 +51,9 @@ def ec2_entities(job_name):
     @type job_name: string
     """
 
-    keypair_name = "hadoopstack-" + job_name
-    sec_slave = "hadoopstack-" + job_name + "-slave"
-    sec_master = "hadoopstack-" + job_name + "-master"
+    keypair_name = "multistack-" + job_name
+    sec_slave = "multistack-" + job_name + "-slave"
+    sec_master = "multistack-" + job_name + "-master"
     return keypair_name, sec_master, sec_slave
 
 def associate_public_ip(conn, instance_id):

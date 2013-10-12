@@ -6,8 +6,8 @@ from time import sleep
 import paramiko
 from flask import current_app
 
-from hadoopstack.services import ec2
-from hadoopstack.services.remote import Remote
+from multistack.services import ec2
+from multistack.services.remote import Remote
 
 def ssh_check(instance_ip, key_location):
     '''
@@ -70,7 +70,7 @@ def configure_master(ip_address, key_location, job_name, user,
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
     out = subprocess.Popen(("knife bootstrap {0} -x {1} -i {2} \
-            -N {3}-master --sudo -r 'recipe[hadoopstack::master]' \
+            -N {3}-master --sudo -r 'recipe[multistack::master]' \
             --no-host-key-verify".format(ip_address, user,
             key_location, job_name)).split(),
             stdout = subprocess.PIPE
@@ -93,7 +93,7 @@ def configure_slave(ip_address, key_location, job_name, user,
 
     out = subprocess.Popen((
         "knife bootstrap {0} -x {1} -i {2} \
-        -N {3}-slave-{4} --sudo -r 'recipe[hadoopstack::slave]' \
+        -N {3}-slave-{4} --sudo -r 'recipe[multistack::slave]' \
         --no-host-key-verify".format(ip_address,
             user, key_location, job_name,
             str(random.random()).split('.')[1])
@@ -112,7 +112,7 @@ def configure_cluster(data, user, general_config):
     '''
 
     job_name = data['job']['name']
-    key_location = "/tmp/hadoopstack-" + job_name + ".pem"
+    key_location = "/tmp/multistack-" + job_name + ".pem"
  
     for node in data['job']['nodes']:
 

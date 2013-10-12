@@ -1,11 +1,11 @@
 from multiprocessing import Process
 
-from hadoopstack import config
-from hadoopstack.dbOperations import db
+from multistack import config
+from multistack.dbOperations import db
 
-import hadoopstack
-import hadoopstack.services.cluster as cluster
-import hadoopstack.services.job
+import multistack
+import multistack.services.cluster as cluster
+import multistack.services.job
 
 def schedule(data, operation):
     """Schedules based on certain filters"""
@@ -42,8 +42,8 @@ def schedule(data, operation):
     elif operation == 'add':
 
         job_id = data['id']
-        if hadoopstack.services.job.info(job_id)[0]:
-            job_obj = hadoopstack.services.job.info(job_id)[1]
+        if multistack.services.job.info(job_id)[0]:
+            job_obj = multistack.services.job.info(job_id)[1]
         else:
             return False
 
@@ -61,8 +61,8 @@ def schedule(data, operation):
     elif operation == 'remove':
 
         job_id = data['id']
-        if hadoopstack.services.job.info(job_id)[0]:
-            job_obj = hadoopstack.services.job.info(job_id)[1]
+        if multistack.services.job.info(job_id)[0]:
+            job_obj = multistack.services.job.info(job_id)[1]
         else:
             return False
 

@@ -1,5 +1,5 @@
-from hadoopstack.main import app
-from hadoopstack import config
+from multistack.main import app
+from multistack import config
 
 with app.app_context():
 	config.set_conf()

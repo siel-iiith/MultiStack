@@ -1,4 +1,4 @@
-from hadoopstack.services.remote import Remote
+from multistack.services.remote import Remote
 
 HADOOP_GID='123'
 HDFS_UID='201'
@@ -119,7 +119,7 @@ def submit_job(data, user, credentials):
     """
 
     job_name = data['job']['name']
-    key_location = "/tmp/hadoopstack-" + job_name + ".pem"
+    key_location = "/tmp/multistack-" + job_name + ".pem"
     
     for node in data['job']['nodes']:
         if node['role'] == 'master':

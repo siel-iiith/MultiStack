@@ -1,5 +1,5 @@
 import os
-import hadoopstack
+import multistack
 from time import sleep
 
 def get_node_objects(conn, role, resv_id=None):
@@ -21,7 +21,7 @@ def get_node_objects(conn, role, resv_id=None):
 
 def flush_data_to_mongo(db_name, data_dict):
 	if db_name == 'job':
-		hadoopstack.main.mongo.db.job.save(data_dict)
+		multistack.main.mongo.db.job.save(data_dict)
 
 	if db_name == 'conf':
-		hadoopstack.main.mongo.db.conf.save(data_dict)
+		multistack.main.mongo.db.conf.save(data_dict)

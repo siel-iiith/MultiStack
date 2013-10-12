@@ -12,7 +12,7 @@ download_install_chef() {
 }
 
 setup_hostname() {
-	echo "chef.hadoopstack" | sudo /etc/hostname
+	echo "chef.multistack" | sudo /etc/hostname
 	sudo service hostname start
 	echo -e "127.0.0.1\t`hostname`" | sudo tee -a /etc/hosts
 }
@@ -64,7 +64,7 @@ upload_cookbooks() {
 	mkdir /tmp/cookbooks
 
 	git clone https://github.com/siel-iiith/hadoop-cookbook.git /tmp/cookbooks/hadoop
-	git clone https://github.com/siel-iiith/hadoopstack-hadoop-cookbook.git /tmp/cookbooks/hadoopstack
+	git clone https://github.com/siel-iiith/multistack-hadoop-cookbook.git /tmp/cookbooks/multistack
 	knife cookbook upload -o /tmp/cookbooks -a
 }
 

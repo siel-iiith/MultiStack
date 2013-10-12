@@ -3,8 +3,8 @@ from fabric.api import run
 from fabric.api import sudo
 from flask import current_app
 
-from hadoopstack.log import LogStream
-from hadoopstack.constants import *
+from multistack.log import LogStream
+from multistack.constants import *
 
 class Remote:
     """

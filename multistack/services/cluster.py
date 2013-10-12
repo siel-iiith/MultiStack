@@ -5,13 +5,13 @@ from time import sleep
 
 from flask import current_app
     
-import hadoopstack
-from hadoopstack.dbOperations.db import get_node_objects
-from hadoopstack.dbOperations.db import flush_data_to_mongo
-from hadoopstack.services.configuration import configure_cluster
-from hadoopstack.services.configuration import configure_slave
-from hadoopstack.services import ec2
-from hadoopstack.services.run import submit_job
+import multistack
+from multistack.dbOperations.db import get_node_objects
+from multistack.dbOperations.db import flush_data_to_mongo
+from multistack.services.configuration import configure_cluster
+from multistack.services.configuration import configure_slave
+from multistack.services import ec2
+from multistack.services.run import submit_job
 
 def spawn(data, cloud):
     """
@@ -78,7 +78,7 @@ def create(data, cloud, general_config):
     cloud provider.
     @type cloud: dict
 
-    @param general_config: General configuration parameters from hadoopstack.configure_slave
+    @param general_config: General configuration parameters from multistack.configure_slave
     @type general_config: dict
     """
 
@@ -105,7 +105,7 @@ def delete(cid, cloud):
 
     current_app.logger.info('deleting')
 
-    job_info = hadoopstack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
+    job_info = multistack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
 
     conn = ec2.make_connection(cloud['auth'])
@@ -163,7 +163,7 @@ def delete(cid, cloud):
 
 def list_clusters():
     clusters_dict = {"clusters": []}
-    for i in list(hadoopstack.main.mongo.db.job.find()):
+    for i in list(multistack.main.mongo.db.job.find()):
         clusters_dict["clusters"].append(i['cluster'])
     return clusters_dict
 
@@ -181,13 +181,13 @@ def add_nodes(data, cloud, job_id, general_config):
     @param job_id: Job ID
     @type job_id: string
 
-    @param general_config: General config parameters of hadoopstack
+    @param general_config: General config parameters of multistack
     @type general_config: dict
     """
 
     conn = ec2.make_connection(cloud['auth'])
 
-    job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+    job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
     job_name = job_obj['name']
     new_node_obj_list = list()
@@ -239,7 +239,7 @@ def remove_nodes(data, cloud, job_id):
 
     conn = ec2.make_connection(cloud['auth'])
 
-    job_db_item = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+    job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
 
     for slave in data['slaves']:

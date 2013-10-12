@@ -1,10 +1,10 @@
 from flask import Blueprint, Flask, request, session, url_for, redirect, jsonify
 
-from hadoopstack.services import job
-from hadoopstack.services import cluster
+from multistack.services import job
+from multistack.services import cluster
 import simplejson
 import json
-import hadoopstack.main
+import multistack.main
 
 import requests
 import os

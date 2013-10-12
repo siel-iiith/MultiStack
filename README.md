@@ -1,9 +1,9 @@
-HadoopStack
+MultiStack
 ==========
 
-Hadoop on Cloud
+BigData on Cloud
 
-Learn more at http://siel-iiith.github.com/HadoopStack/
+Learn more at http://siel-iiith.github.com/MultiStack/
 
 Usage
 ======

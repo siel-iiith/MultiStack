@@ -5,10 +5,10 @@ from os.path import basename
 import ConfigParser
 import uuid
 
-from hadoopstack.dbOperations.db import flush_data_to_mongo
-import hadoopstack
+from multistack.dbOperations.db import flush_data_to_mongo
+import multistack
 
-def config_parser(filename = "/etc/hadoopstack/hadoopstack.conf"):
+def config_parser(filename = "/etc/multistack/multistack.conf"):
 
     config = ConfigParser.ConfigParser()
     config.read(filename)
@@ -53,7 +53,7 @@ def parse_cloud_conf(filename):
 
     return cloud
 
-def parse_hadoopstack_conf(filename):
+def parse_multistack_conf(filename):
     conf = dict()
     conf['general'] = dict()
 
@@ -70,9 +70,9 @@ def parse_hadoopstack_conf(filename):
 
     return conf
 
-def set_conf(conf_dir = "/etc/hadoopstack"):
+def set_conf(conf_dir = "/etc/multistack"):
 
-    conf = parse_hadoopstack_conf(join(conf_dir, 'hadoopstack.conf'))
+    conf = parse_multistack_conf(join(conf_dir, 'multistack.conf'))
 
     cloud_dir = join(conf_dir, 'clouds')
     clouds = list()
@@ -83,8 +83,8 @@ def set_conf(conf_dir = "/etc/hadoopstack"):
 
     conf['clouds'] = clouds
 
-    hadoopstack.main.mongo.db.conf.remove()
+    multistack.main.mongo.db.conf.remove()
     flush_data_to_mongo('conf', conf)
 
 def read_conf():
-    return hadoopstack.main.mongo.db.conf.find()[0]
+    return multistack.main.mongo.db.conf.find()[0]

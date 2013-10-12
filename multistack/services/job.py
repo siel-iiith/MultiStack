@@ -7,11 +7,11 @@ from flask import make_response
 from flask import jsonify
 from flask import current_app
 
-import hadoopstack
-from hadoopstack.dbOperations.db import flush_data_to_mongo
-from hadoopstack.log import set_prefixed_format
-from hadoopstack.scheduler.scheduler import schedule
-import hadoopstack.services.cluster as cluster
+import multistack
+from multistack.dbOperations.db import flush_data_to_mongo
+from multistack.log import set_prefixed_format
+from multistack.scheduler.scheduler import schedule
+import multistack.services.cluster as cluster
 
 from bson import objectid
 
@@ -24,7 +24,7 @@ def create(data):
     if validation_result != True:
         return validation_result
 
-    hadoopstack.main.mongo.db.job.insert(data)
+    multistack.main.mongo.db.job.insert(data)
     id_t = str(data['_id'])
     data['job']['id'] = id_t
     flush_data_to_mongo('job', data)
@@ -44,7 +44,7 @@ def validate(data):
 
     flavor = ['t1.micro', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']
 
-    existing_job = hadoopstack.main.mongo.db.job.find_one({'job.name': data['job']['name']})
+    existing_job = multistack.main.mongo.db.job.find_one({'job.name': data['job']['name']})
 
     if existing_job != None:
         return make_response("JOB_ALREADY_EXISTS", 400)
@@ -84,7 +84,7 @@ def delete(job_id):
 def info(job_id):
 
     try:
-        job_info = hadoopstack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
+        job_info = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
         job_info.pop('_id')
         return True, job_info
 
@@ -94,7 +94,7 @@ def info(job_id):
 def job_list():
 
     jobs_dict = {"jobs": []}
-    for i in list(hadoopstack.main.mongo.db.job.find()):
+    for i in list(multistack.main.mongo.db.job.find()):
         jobs_dict["jobs"].append(i['job'])
 
     return jobs_dict
