@@ -5,6 +5,8 @@ BigData on Cloud
 
 Learn more at http://siel-iiith.github.com/MultiStack/
 
+Current Stable Release - v0.1
+
 Usage
 ======
 ```
