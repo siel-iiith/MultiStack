@@ -1,55 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>MultiStack by siel-iiith</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="MultiStack : BigData on MultiCloud" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>MultiStack</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>MultiStack</h1>
-        <p>BigData on MultiCloud</p>
 
-        <p class="view"><a href="https://github.com/siel-iiith/MultiStack">View the Project on GitHub <small>siel-iiith/MultiStack</small></a></p>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/siel-iiith/MultiStack">View on GitHub</a>
 
+          <h1 id="project_title">MultiStack</h1>
+          <h2 id="project_tagline">BigData on MultiCloud</h2>
 
-        <ul>
-          <li><a href="https://github.com/siel-iiith/MultiStack/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/siel-iiith/MultiStack/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/siel-iiith/MultiStack">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/siel-iiith/MultiStack/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/siel-iiith/MultiStack/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>
 <a name="multistack" class="anchor" href="#multistack"><span class="octicon octicon-link"></span></a>MultiStack</h1>
 
 <p>There is a growing requirement of running Hadoop on Cloud. In response to this, various solutions have come out in both public and private domains. Being early solutions, they provide basic features but have only touched the tip of the iceberg. We are yet to see the real benefits of taking Hadoop to cloud.
-In this presentation we discuss our experiences in building an orchestrator called HadoopStack for deploying, managing and monitoring Hadoop jobs across clouds. It exploits cloud to offer features like auto-scaling, aggregated monitoring, job specific optimizations, isolation and smarter job scheduling within and across clouds. </p>
+In this presentation we discuss our experiences in building an orchestrator called MultiStack for deploying, managing and monitoring Hadoop jobs across clouds. It exploits cloud to offer features like auto-scaling, aggregated monitoring, job specific optimizations, isolation and smarter job scheduling within and across clouds. </p>
 
-<p>Traditionally, Hadoop has never been a part of cloud and has been restricted to a single cluster. HadoopStack allows enterprises to run jobs across multiple clouds/clusters seamlessly. It reduces job completion time and improves resource utilization using machine learning based job scheduling. HadoopStack scheduler uses fine-grained monitoring data to scale Hadoop clusters automatically and can use spot instances to lower the cost. We plan to integrate Hive, Mahout and Giraph to drive data analytics on cloud.</p>
+<p>Traditionally, Hadoop has never been a part of cloud and has been restricted to a single cluster. MultiStack allows enterprises to run jobs across multiple clouds/clusters seamlessly. It reduces job completion time and improves resource utilization using machine learning based job scheduling. MultiStack scheduler uses fine-grained monitoring data to scale Hadoop clusters automatically and can use spot instances to lower the cost. We plan to integrate Hive, Mahout and Giraph to drive data analytics on cloud.</p>
 
 <h3>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
 
 <ul>
 <li>
-<strong>Auto Scaling</strong> - Based on the deadline, infrastructure and cost requirements, the scheduler will smartly scale the resources allocated to a job. The user is also provided an option to manually scale up/down.</li>
+<strong>Scaling</strong> - Based on the deadline, infrastructure and cost requirements, the scheduler will smartly scale the resources allocated to a job. The user is also provided an option to manually scale up/down.</li>
 <li>
-<strong>Ability to run across multiple cloud providers</strong> - If you have multiple jobs and access to multiple cloud providers, HadoopStack provides you the ability to run different jobs on different clouds.</li>
+<strong>Ability to run across multiple cloud providers</strong> - If you have multiple jobs and access to multiple cloud providers, MultiStack provides you the ability to run different jobs on different clouds.</li>
 <li>
-<strong>Job scheduling for minimizing cost and completion time</strong> - HadoopStack uses machine learning to smartly allocate jobs across multiple cloud providers aiming to reduce your cost and task-completion time.</li>
+<strong>Job scheduling for minimizing cost and completion time</strong> - MultiStack uses machine learning to smartly allocate jobs across multiple cloud providers aiming to reduce your cost and task-completion time.</li>
 <li>
-<strong>Performance optimization with storage integration</strong> - With storage administration privileges, HadoopStack auto-replicates the resources that being utilized heavily, thus improving performance.</li>
+<strong>Performance optimization with storage integration</strong> - With storage administration privileges, MultiStack auto-replicates the resources that being utilized heavily, thus improving performance.</li>
 <li>
-<strong>Client Tools</strong> - A web interface and a simple command line interface for interacting with HadoopStack.</li>
+<strong>Client Tools</strong> - A web interface and a simple command line interface for interacting with MultiStack.</li>
 </ul><h3>
 <a name="use-cases" class="anchor" href="#use-cases"><span class="octicon octicon-link"></span></a>Use Cases</h3>
 
@@ -57,35 +60,51 @@ In this presentation we discuss our experiences in building an orchestrator call
 <li>Running multiple jobs on a private cloud</li>
 <li>Running multiple jobs on a public cloud</li>
 <li>Running multiple jobs across private and public clouds</li>
-</ul><p><img src="https://docs.google.com/drawings/pub?id=1a_3mXukjkgnuK-awaMA2WrHXL-R4XCRcKs98AHd6n3w&amp;w=988&amp;h=268" alt="HadoopStack-deployment"></p>
+</ul><p><img src="https://docs.google.com/drawings/pub?id=1a_3mXukjkgnuK-awaMA2WrHXL-R4XCRcKs98AHd6n3w&amp;w=988&amp;h=268" alt="MultiStack-deployment"></p>
 
 <h3>
 <a name="architecture" class="anchor" href="#architecture"><span class="octicon octicon-link"></span></a>Architecture</h3>
 
-<p><img src="https://docs.google.com/drawings/pub?id=1HHlZGTWTP-v6nFdsarIyLV6l-p5aUchV8OQyFkcF3Gk&amp;w=950&amp;h=389" alt="HadoopStack Server Architecture"></p>
+<p><img src="https://docs.google.com/drawings/pub?id=1HHlZGTWTP-v6nFdsarIyLV6l-p5aUchV8OQyFkcF3Gk&amp;w=950&amp;h=389" alt="MultiStack Server Architecture"></p>
+
+<h3>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a><a href="https://github.com/siel-iiith/MultiStack/wiki/API">API</a>
+</h3>
 
 <h3>
 <a name="roadmap" class="anchor" href="#roadmap"><span class="octicon octicon-link"></span></a>RoadMap</h3>
 
 <ul>
 <li>Improving instance monitoring for better scheduling.</li>
-<li>Integration of other frameworks - R, mahout, hive/pig etc.</li>
+<li>Integration of other frameworks - R, mahout, hive/pig, Spark etc.</li>
+<li>AutoScaling based on workload characterization.</li>
 </ul><h3>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h3>
+
+<p>The use and distribution terms for this software are covered by the Apache 2.0 License (<a href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a>) which can be found in the file LICENSE at the root of this distribution. By using this software in any fashion, you are agreeing to be bound by the terms of this license. You must not remove this notice, or any other, from this software.</p>
+
+<h3>
 <a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h3>
 
 <ul>
 <li>
 <a href="https://github.com/dharmeshkakadia">Dharmesh Kakadia</a> (<a href="mailto:dharmesh.kakadia@research.iiit.ac.in">dharmesh.kakadia@research.iiit.ac.in</a>)</li>
-<li>Shashank Sahni (<a href="mailto:shashank.sahni@research.iiit.ac.in">shashank.sahni@research.iiit.ac.in</a>)</li>
-<li><a href="https://github.com/u">Kumar Rishabh</a></li>
+<li>
+<a href="https://github.com/shredder12">Shashank Sahni</a> (<a href="mailto:shashank.sahni@research.iiit.ac.in">shashank.sahni@research.iiit.ac.in</a>)</li>
+<li><a href="https://github.com/hellboy2k8">Kumar Rishabh</a></li>
+<li><a href="https://github.com/VishrutMehta">Vishrut Mehta</a></li>
 </ul>
       </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/siel-iiith">siel-iiith</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">MultiStack maintained by <a href="https://github.com/siel-iiith">siel-iiith</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -96,6 +115,7 @@ In this presentation we discuss our experiences in building an orchestrator call
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
+
 
   </body>
 </html>
