@@ -16,7 +16,7 @@ class EC2Provider(BaseProvider):
     specific class.
     """
 
-    def _connect(credentials):
+    def _connect(self, credentials):
         """
         A general function to connect cloud provider endpoing using EC2 API
 
@@ -52,31 +52,32 @@ class EC2Provider(BaseProvider):
                         )
         return conn
 
-    def associate_public_ip(conn, instance_id):
+    def associate_public_ip(self, instance_id):
         """Associates public_ip with the instance"""
 
-        for addr in conn.get_all_addresses():
-            if addr.instance_id is '':
-                addr.associate(instance_id)
-                return
-
-        addr = conn.allocate_address()
+        addr = self.conn.allocate_address()
         addr.associate(instance_id)
         current_app.logger.info("IP Associated: {0}".format(addr.public_ip))
+        return addr.public_ip
 
-    def release_public_ips(conn, public_ips_list):
+    def release_public_ip(self, public_ip):
         """
         Releases public_ips attached to the instances
 
-        @param public_ips_list: list of public public_ips
-        @type public_ips_list: list
+        @param public_ip: public_ip
+        @type public_ip: C{str}
         """
+        if public_ip == '':
+            return
 
-        for addr in conn.get_all_addresses(addresses = public_ips_list):
-            if addr.instance_id == '':
+        for addr in self.conn.get_all_addresses(addresses = [public_ip]):
+            if addr.instance_id is None:
+                addr.release()
+            else:
+                addr.disassociate()
                 addr.release()
 
-    def boot_instances(conn, 
+    def boot_instances(self, 
                         number, 
                         keypair,
                         security_groups,
@@ -86,16 +87,13 @@ class EC2Provider(BaseProvider):
         """
         Boot Instances
 
-        @param conn: EC2 connection object
-        @type conn: boto.ec2.connection.EC2Connection
-
         @param number: number of instances to boot
         @type number: int
 
         @param keypair: Keypair name
         @type keypair: string
 
-        @param security_groups: name of the security security_groups
+        @param security_groups: name of the security groups
         @type security_groups: string
 
         @param flavor: instance type
@@ -105,7 +103,9 @@ class EC2Provider(BaseProvider):
         @type image_id: string
         """
 
-        reservation = conn.run_instances(image_id, int(number), int(number), keypair, security_groups, instance_type=flavor)
+        reservation = self.conn.run_instances(image_id, int(number), 
+                                        int(number), keypair, security_groups,
+                                        instance_type=flavor)
         
         for instance in reservation.instances:
             while instance.state == 'pending':
@@ -113,16 +113,11 @@ class EC2Provider(BaseProvider):
                 current_app.logger.info("waiting for instance status to update")
                 instance.update()
 
-            associate_public_ip(conn, instance.id)
-
         return reservation
 
-    def create_keypair(conn, keypair_name, key_dir = '/tmp'):
+    def create_keypair(self, keypair_name, key_dir = '/tmp'):
         """
         Creates keypair and saves it in key_dir directory
-
-        @param conn: EC2 connection object
-        @type conn: boto.ec2.connection.EC2Connection
 
         @param keypair_name: Keypair name
         @type keypair_name: string
@@ -131,17 +126,14 @@ class EC2Provider(BaseProvider):
         @type key_dir: string
         """
 
-        keypair = conn.create_key_pair(keypair_name)
+        keypair = self.conn.create_key_pair(keypair_name)
         keypair.save(key_dir)
 
         # TODO - Save this keypair file in the mongodb
 
-    def create_security_groups(conn, sec_master_name, sec_slave_name):
+    def create_security_groups(self, sec_master_name, sec_slave_name):
         """
         Creates Security groups.
-
-        @param conn: EC2 connection object
-        @type conn: boto.ec2.connection.EC2Connection
 
         @param sec_master_name: Name of master's security group
         @type sec_master_name: string
@@ -150,8 +142,10 @@ class EC2Provider(BaseProvider):
         @type sec_slave_name: string
         """
 
-        sec_slave = conn.create_security_group(sec_slave_name, "Security group for the slaves")
-        sec_master = conn.create_security_group(sec_master_name, "Security group for the master")
+        sec_slave = self.conn.create_security_group(sec_slave_name,
+                                            "Security group for the slaves")
+        sec_master = self.conn.create_security_group(sec_master_name,
+                                            "Security group for the master")
 
         # For now we'll authorize all the connections. We can add
         # granular rules later
@@ -190,3 +184,55 @@ class EC2Provider(BaseProvider):
             from_port = -1,
             to_port = -1,
             cidr_ip = "0.0.0.0/0")
+
+    def delete_keypair(self):
+        """Delete a Keypair"""
+
+        for keypair in self.conn.get_all_key_pairs(keynames = [self.keypair]):
+            keypair.delete()
+
+    def delete_security_groups(self, security_groups):
+        """
+        Delete security groups
+
+        @param security_groups: List of security groups to be deleted
+        @type security_groups: List
+        """
+
+        if len(security_groups) == 0:
+            return
+
+        flag = True
+        print security_groups
+        while flag:
+            flag = False
+            for sg in self.conn.get_all_security_groups(groupnames = security_groups):
+                if len(sg.instances()) == 0:
+                    print "instances", sg.instances()
+                    sg.delete()
+                else:
+                    flag = True
+
+    def terminate_instances(self, instance_ids):
+        """
+        Terminate Instances
+
+        @param instance_ids: List of Instance IDs to be deleted
+        @type instance_ids: List
+        """
+
+        if len(instance_ids) == 0:
+            return
+
+        print instance_ids
+
+        flag = True
+        while flag:
+            flag = False
+            for instance in self.conn.get_only_instances(instance_ids = instance_ids):
+                if instance.state == 'running':
+                    flag = True
+                    instance.terminate()
+
+                elif instance.state != 'terminated':
+                    flag = True
