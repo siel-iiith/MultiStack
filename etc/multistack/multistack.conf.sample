@@ -11,8 +11,8 @@ syslog_server_port=
 
 # Flask-PyMongo Configuration
 [flask]
-MONGO_HOST=
-MONGO_DBNAME=
+MONGO_HOST=127.0.0.1
+MONGO_DBNAME=clusters
 
 # Flask Configuration
 CSRF_ENABLED=True
