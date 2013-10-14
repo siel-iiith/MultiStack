@@ -1,7 +1,7 @@
 [DEFAULT]
 name=aws
 default_image_id=ami-xxxxxx
-user=ec2-user
+user=ubuntu
 
 # lower is better
 priority=1
