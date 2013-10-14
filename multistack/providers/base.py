@@ -12,12 +12,7 @@ class BaseProvider:
 	provider specific operations in abstracted way.
 	"""
 
-	self.conn = None
-	self.keypair = None
-	self.master_security_group = None
-	self.slave_security_group = None
-
-	def __init__(name, credentials):
+	def __init__(self, name, credentials):
 		self.conn = self._connect(credentials)
 		self.keypair = ('multistack-{0}'.format(name))
 		self.master_security_group = ('multistack-{0}-master'.format(name))
@@ -35,11 +30,17 @@ class BaseProvider:
 	def create_security_groups():
 		raise NotImplementedError
 
-	def release_public_ips():
-		raise NotImplementedError
-
 	def release_public_ip():
 		raise NotImplementedError
 
 	def associate_public_ip():
+		raise NotImplementedError
+
+	def delete_keypair():
+		raise NotImplementedError
+
+	def delete_security_groups():
+		raise NotImplementedError
+
+	def terminate_instances():
 		raise NotImplementedError
