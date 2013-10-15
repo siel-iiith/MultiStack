@@ -166,22 +166,20 @@ def add_nodes(data, cloud, job_id, general_config):
     @type general_config: dict
     """
 
-    conn = ec2.make_connection(cloud['auth'])
-
     job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
     job_name = job_obj['name']
     new_node_obj_list = list()
 
-    keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
-    key_location = '/tmp/'  + keypair_name + '.pem'
+    initiate_cloud(cloud['provider'], job_name, cloud['auth'])
+
+    key_location = '/tmp/'  + current_app.cloud.keypair + '.pem'
 
     for slave in data['slaves']:
-        res_slave = ec2.boot_instances(
-                conn,
+        res_slave = current_app.cloud.boot_instances(
                 slave['instances'],
-                keypair_name,
-                [sec_master],
+                current_app.cloud.keypair,
+                [current_app.cloud.slave_security_group],
                 slave['flavor'],
                 cloud['default_image_id']
                 )
@@ -191,17 +189,19 @@ def add_nodes(data, cloud, job_id, general_config):
             if slave['flavor'] == job_obj['slaves'][count]['flavor']:
                 job_obj['slaves'][count]['instances'] += 1
 
-        node_obj = get_node_objects(conn, "slave", res_slave.id)
+        node_obj = get_node_objects("slave", res_slave.id)
         job_obj['nodes'] += node_obj
         new_node_obj_list += node_obj
         job_db_item['job'] = job_obj
         flush_data_to_mongo('job', job_db_item)
 
     for new_node_obj in new_node_obj_list:
-        configure_slave(new_node_obj['ip_address'],
+        slave_public_ip = current_app.cloud.associate_public_ip(new_node_obj['id'])
+        configure_slave(slave_public_ip,
                         key_location, job_name, cloud['user'],
                         general_config['chef_server_hostname'],
                         general_config['chef_server_ip'])
+        current_app.cloud.release_public_ip(slave_public_ip)
 
 def remove_nodes(data, cloud, job_id):
     """
@@ -218,15 +218,16 @@ def remove_nodes(data, cloud, job_id):
     @type job_id: string
     """
 
-    conn = ec2.make_connection(cloud['auth'])
-
     job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
+    job_name = job_obj['name']
+
+    initiate_cloud(job_obj['cloud'], job_name, cloud['auth'])
 
     for slave in data['slaves']:
         for node in job_obj['nodes']:
             if slave['flavor'] == node['flavor'] and node['role'] != 'master':
-                conn.terminate_instances(node['id'].split())
+                current_app.cloud.terminate_instances(node['id'].split())
                 slave['instances'] -=1
                 job_obj['nodes'].remove(node)
             if slave['instances'] == 0:
