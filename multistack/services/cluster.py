@@ -8,6 +8,7 @@ from flask import current_app
 import multistack
 from multistack.dbOperations.db import get_node_objects
 from multistack.dbOperations.db import flush_data_to_mongo
+from multistack.providers import initiate_cloud
 from multistack.services.configuration import configure_cluster
 from multistack.services.configuration import configure_slave
 from multistack.services import ec2
@@ -32,37 +33,36 @@ def spawn(data, cloud):
     data['job']['status'] = 'spawning'
     flush_data_to_mongo('job', data)
 
-    job_name = data['job']['name']
-    keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
+    cloud = current_app.cloud
 
-    conn = ec2.make_connection(cloud['auth'])
-    ec2.create_keypair(conn, keypair_name)
-    ec2.create_security_groups(conn, sec_master, sec_slave)
+    cloud.create_keypair(cloud.keypair)
+    cloud.create_security_groups(cloud.master_security_group,
+                            cloud.slave_security_group)
 
     master = data['job']['master']
 
-    res_master = ec2.boot_instances(
-        conn,
+    res_master = cloud.boot_instances(
         1,
-        keypair_name,
-        [sec_master],
+        cloud.keypair,
+        [cloud.master_security_group],
         flavor = master['flavor'],
 		image_id = image_id
         )
 
-    data['job']['nodes'] += get_node_objects(conn, "master", res_master.id)
+    current_app.cloud.associate_public_ip(res_master.instances[0].id)
+
+    data['job']['nodes'] += get_node_objects("master", res_master.id)
     flush_data_to_mongo('job', data)
 
     for slave in data['job']['slaves']:
-        res_slave = ec2.boot_instances(
-            conn,
+        res_slave = cloud.boot_instances(
             slave['instances'],
-            keypair_name,
-            [sec_slave],
+            cloud.keypair,
+            [cloud.slave_security_group],
             flavor = slave['flavor'],
 			image_id = image_id
             )
-        data['job']['nodes'] += get_node_objects(conn, "slave", res_slave.id)
+        data['job']['nodes'] += get_node_objects("slave", res_slave.id)
         flush_data_to_mongo('job', data)
 
     return
@@ -85,6 +85,7 @@ def create(data, cloud, general_config):
     # TODO: We need to create an request-check/validation filter before inserting
 
     current_app.logger.info('creating')
+    initiate_cloud(cloud['provider'], data['job']['name'], cloud['auth'])
     spawn(data, cloud)
     configure_cluster(data, cloud['user'], general_config)
     submit_job(data, cloud['user'], cloud['auth'])
@@ -108,56 +109,38 @@ def delete(cid, cloud):
     job_info = multistack.main.mongo.db.job.find({"_id": objectid.ObjectId(cid)})[0]['job']
     job_name = job_info['name']
 
-    conn = ec2.make_connection(cloud['auth'])
+    initiate_cloud(job_info['cloud'], job_name, cloud['auth'])
+    cloud = current_app.cloud
+    conn = cloud.conn
 
-    keypair, sec_grp_master, sec_grp_slave = ec2.ec2_entities(job_name)
-    security_groups = [sec_grp_master, sec_grp_slave]
-    public_ips = list()
+    security_groups = [
+                    cloud.master_security_group,
+                    cloud.slave_security_group
+                    ]
 
-    for res in conn.get_all_instances():
-        for instance in res.instances:
-            for node in job_info['nodes']:
-                if instance.id == str(node['id']):
-                    instance.terminate()
-    current_app.logger.info("Terminated Instances")
-
-    for kp in conn.get_all_key_pairs():
-        if kp.name == keypair:
-            kp.delete()
-    current_app.logger.info("Deleted Keypairs")
-
-    while True:
-        try:
-            for sg in conn.get_all_security_groups(
-                                                groupnames = security_groups):
-                if len(sg.instances()) == 0:
-                    sg.delete()
-                    security_groups.remove(sg.name)
-                else:
-                    all_dead = True
-                    for instance in sg.instances():
-                        if instance.state != 'terminated':
-                            # To stop code from requesting blindly
-                            sleep(2)
-                            all_dead = False
-
-                    if all_dead:
-                        sg.delete()
-                        security_groups.remove(sg.name)
-            if len(security_groups) == 0:
-                current_app.logger.info("Deleted Security Groups")
-                break;
-        except:
-            current_app.logger.error("Error:".format(sys.exc_info()[0]))
-            break
+    instance_ids = list()
 
     for node in job_info['nodes']:
-        public_ips.append(node['ip_address'])
+        instance_ids.append(node['id'])
 
-    if len(public_ips) > 0:
-        ec2.release_public_ips(conn, public_ips)
+    for addr in cloud.conn.get_all_addresses():
+        for node in job_info['nodes']:
+            if addr.instance_id == node['id']:
+                cloud.release_public_ip(addr.public_ip)
 
-    current_app.logger.info("Released Elastic IPs")
+    current_app.logger.info("Released Addresses")
+
+    cloud.terminate_instances(instance_ids)
+
+    current_app.logger.info("Terminated Instances")
+
+    cloud.delete_keypair()
+
+    current_app.logger.info("Deleted Keypairs")
+
+    cloud.delete_security_groups(security_groups)
+
+    current_app.logger.info("Deleted Security Groups")
 
     return True
 
@@ -185,22 +168,20 @@ def add_nodes(data, cloud, job_id, general_config):
     @type general_config: dict
     """
 
-    conn = ec2.make_connection(cloud['auth'])
-
     job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
     job_name = job_obj['name']
     new_node_obj_list = list()
 
-    keypair_name, sec_master, sec_slave = ec2.ec2_entities(job_name)
-    key_location = '/tmp/'  + keypair_name + '.pem'
+    initiate_cloud(cloud['provider'], job_name, cloud['auth'])
+
+    key_location = '/tmp/'  + current_app.cloud.keypair + '.pem'
 
     for slave in data['slaves']:
-        res_slave = ec2.boot_instances(
-                conn,
+        res_slave = current_app.cloud.boot_instances(
                 slave['instances'],
-                keypair_name,
-                [sec_master],
+                current_app.cloud.keypair,
+                [current_app.cloud.slave_security_group],
                 slave['flavor'],
                 cloud['default_image_id']
                 )
@@ -210,17 +191,19 @@ def add_nodes(data, cloud, job_id, general_config):
             if slave['flavor'] == job_obj['slaves'][count]['flavor']:
                 job_obj['slaves'][count]['instances'] += 1
 
-        node_obj = get_node_objects(conn, "slave", res_slave.id)
+        node_obj = get_node_objects("slave", res_slave.id)
         job_obj['nodes'] += node_obj
         new_node_obj_list += node_obj
         job_db_item['job'] = job_obj
         flush_data_to_mongo('job', job_db_item)
 
     for new_node_obj in new_node_obj_list:
-        configure_slave(new_node_obj['ip_address'],
+        slave_public_ip = current_app.cloud.associate_public_ip(new_node_obj['id'])
+        configure_slave(slave_public_ip,
                         key_location, job_name, cloud['user'],
                         general_config['chef_server_hostname'],
                         general_config['chef_server_ip'])
+        current_app.cloud.release_public_ip(slave_public_ip)
 
 def remove_nodes(data, cloud, job_id):
     """
@@ -237,15 +220,16 @@ def remove_nodes(data, cloud, job_id):
     @type job_id: string
     """
 
-    conn = ec2.make_connection(cloud['auth'])
-
     job_db_item = multistack.main.mongo.db.job.find_one({"_id": objectid.ObjectId(job_id)})
     job_obj = job_db_item['job']
+    job_name = job_obj['name']
+
+    initiate_cloud(job_obj['cloud'], job_name, cloud['auth'])
 
     for slave in data['slaves']:
         for node in job_obj['nodes']:
             if slave['flavor'] == node['flavor'] and node['role'] != 'master':
-                conn.terminate_instances(node['id'].split())
+                current_app.cloud.terminate_instances(node['id'].split())
                 slave['instances'] -=1
                 job_obj['nodes'].remove(node)
             if slave['instances'] == 0:

@@ -1,10 +1,15 @@
 import os
-import multistack
 from time import sleep
 
-def get_node_objects(conn, role, resv_id=None):
+from flask import current_app
+
+import multistack
+
+def get_node_objects(role, resv_id=None):
 
 	nodes = list()
+	conn = current_app.cloud.conn
+
 	for resv in conn.get_all_instances():
 		if resv.id == resv_id:
 			for instance in resv.instances:

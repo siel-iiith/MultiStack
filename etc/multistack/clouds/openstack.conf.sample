@@ -3,6 +3,7 @@ default_image_id=ami-xxxxxxx
 priority=0
 user=ubuntu
 name=openstack
+provider=openstack
 
 [auth]
 ec2_url=http://ipaddress:8773/services/Cloud

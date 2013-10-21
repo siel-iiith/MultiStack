@@ -2,6 +2,7 @@
 name=aws
 default_image_id=ami-xxxxxx
 user=ubuntu
+provider=ec2
 
 # lower is better
 priority=1
