@@ -208,8 +208,12 @@ class EC2Provider(BaseProvider):
             flag = False
             for sg in self.conn.get_all_security_groups(groupnames = security_groups):
                 if len(sg.instances()) == 0:
-                    print "instances", sg.instances()
-                    sg.delete()
+                    try:
+                        sg.delete()
+                        security_groups.remove(sg.name)
+                    except:
+                        flag = True
+                        continue
                 else:
                     flag = True
 
