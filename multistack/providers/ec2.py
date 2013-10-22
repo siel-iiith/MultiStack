@@ -204,10 +204,10 @@ class EC2Provider(BaseProvider):
             to_port = -1,
             cidr_ip = "0.0.0.0/0")
 
-    def delete_keypair(self):
+    def delete_keypair(self, keypair_name):
         """Delete a Keypair"""
 
-        for keypair in self.conn.get_all_key_pairs(keynames = [self.keypair]):
+        for keypair in self.conn.get_all_key_pairs(keynames = [keypair_name]):
             keypair.delete()
 
     def delete_security_groups(self, security_groups):

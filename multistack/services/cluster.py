@@ -131,7 +131,7 @@ def delete(cid, cloud):
 
     current_app.logger.info("Terminated Instances")
 
-    cloud.delete_keypair()
+    cloud.delete_keypair(cloud.keypair)
 
     current_app.logger.info("Deleted Keypairs")
 
