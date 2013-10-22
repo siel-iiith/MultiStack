@@ -41,30 +41,25 @@ def spawn(data, cloud):
 
     master = data['job']['master']
 
-    res_master = cloud.boot_instances(
-        cloud.master_name,
-        1,
-        cloud.keypair,
-        [cloud.master_security_group],
-        flavor = master['flavor'],
-		image_id = image_id
-        )
-
-    current_app.cloud.associate_public_ip(res_master.instances[0].id)
-
-    data['job']['nodes'] += get_node_objects("master", res_master.id)
+    data['job']['nodes'] += cloud.boot_instances(
+                                        cloud.master_name,
+                                        1,
+                                        cloud.keypair,
+                                        [cloud.master_security_group],
+                                        flavor = master['flavor'],
+                                        image_id = image_id
+                                        )
     flush_data_to_mongo('job', data)
 
     for slave in data['job']['slaves']:
-        res_slave = cloud.boot_instances(
-            cloud.slave_name,
-            slave['instances'],
-            cloud.keypair,
-            [cloud.slave_security_group],
-            flavor = slave['flavor'],
-			image_id = image_id
-            )
-        data['job']['nodes'] += get_node_objects("slave", res_slave.id)
+        data['job']['nodes'] += cloud.boot_instances(
+                                                cloud.slave_name,
+                                                slave['instances'],
+                                                cloud.keypair,
+                                                [cloud.slave_security_group],
+                                                flavor = slave['flavor'],
+                                                image_id = image_id
+                                                )
         flush_data_to_mongo('job', data)
 
     return

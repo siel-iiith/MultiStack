@@ -87,7 +87,7 @@ class EC2Provider(BaseProvider):
                     image_id
                     ):
         """
-        Boot Instances
+        Boot Instances and Associate a Public IP with each
 
         @param name: Name of the instance
         @type name: string
@@ -104,9 +104,12 @@ class EC2Provider(BaseProvider):
         @param flavor: instance type
         @type flavor: string
 
-        @type image_id: image-id
+        @param image_id: image-id
         @type image_id: string
         """
+
+        servers = list()
+        server = dict()
 
         reservation = self.conn.run_instances(image_id, int(number), 
                                         int(number), keypair, security_groups,
@@ -119,7 +122,17 @@ class EC2Provider(BaseProvider):
                 current_app.logger.info("waiting for instance status to update")
                 instance.update()
 
-        return reservation
+        for instance in reservation.instances:
+            self.associate_public_ip(instance.id)
+            instance.update()
+            server['id'] = instance.id
+            server['private_ip_address'] = instance.private_ip_address
+            server['ip_address'] = instance.ip_address
+            server['flavor'] = instance.instance_type
+            server['role'] = name.split('-')[-1]
+            servers.append(server)
+
+        return servers
 
     def create_keypair(self, keypair_name, key_dir = '/tmp'):
         """
