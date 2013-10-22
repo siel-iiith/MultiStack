@@ -42,6 +42,7 @@ def spawn(data, cloud):
     master = data['job']['master']
 
     res_master = cloud.boot_instances(
+        cloud.master_name,
         1,
         cloud.keypair,
         [cloud.master_security_group],
@@ -56,6 +57,7 @@ def spawn(data, cloud):
 
     for slave in data['job']['slaves']:
         res_slave = cloud.boot_instances(
+            cloud.slave_name,
             slave['instances'],
             cloud.keypair,
             [cloud.slave_security_group],

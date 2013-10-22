@@ -77,15 +77,20 @@ class EC2Provider(BaseProvider):
                 addr.disassociate()
                 addr.release()
 
-    def boot_instances(self, 
-                        number, 
-                        keypair,
-                        security_groups,
-                        flavor,
-                        image_id
-                        ):
+    def boot_instances(
+                    self,
+                    name,
+                    number,
+                    keypair,
+                    security_groups,
+                    flavor,
+                    image_id
+                    ):
         """
         Boot Instances
+
+        @param name: Name of the instance
+        @type name: string
 
         @param number: number of instances to boot
         @type number: int
@@ -108,6 +113,7 @@ class EC2Provider(BaseProvider):
                                         instance_type=flavor)
         
         for instance in reservation.instances:
+            instance.add_tag('Name', name)
             while instance.state == 'pending':
                 sleep(4)
                 current_app.logger.info("waiting for instance status to update")
