@@ -27,10 +27,9 @@ def parse_cloud_conf(filename):
 
     if config.has_section('auth'):
         cloud['auth'] = dict()
-        cloud['auth']['ec2_access_key'] = config.get('auth', 'ec2_access_key')
-        cloud['auth']['ec2_secret_key'] = config.get('auth', 'ec2_secret_key')
-        cloud['auth']['ec2_url'] = config.get('auth', 'ec2_url')
-        cloud['auth']['ec2_region'] = config.get('auth', 'ec2_region')
+        for item in config.items('auth'):
+            if item not in config.items('DEFAULT'):
+                cloud['auth'][item[0]] = item[1]
 
     if config.has_section('quota'):
         cloud['quota'] = dict()
@@ -82,6 +81,7 @@ def set_conf(conf_dir = "/etc/multistack"):
             clouds.append(parse_cloud_conf(join(cloud_dir, cloud_file)))
 
     conf['clouds'] = clouds
+    print conf['clouds']
 
     multistack.main.mongo.db.conf.remove()
     flush_data_to_mongo('conf', conf)
