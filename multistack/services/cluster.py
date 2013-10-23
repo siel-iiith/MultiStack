@@ -119,7 +119,7 @@ def delete(cid, cloud):
     for node in job_info['nodes']:
         instance_ids.append(node['id'])
 
-    for addr in cloud.conn.get_all_addresses():
+    for addr in cloud.get_all_addresses():
         for node in job_info['nodes']:
             if addr.instance_id == node['id']:
                 cloud.release_public_ip(addr.public_ip)
