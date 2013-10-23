@@ -236,6 +236,13 @@ class EC2Provider(BaseProvider):
                 else:
                     flag = True
 
+    def get_all_addresses(self):
+        """
+        List all public addresses available
+        """
+
+        return self.conn.get_all_addresses()
+
     def terminate_instances(self, instance_ids):
         """
         Terminate Instances
