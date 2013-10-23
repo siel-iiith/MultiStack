@@ -67,7 +67,7 @@ class EC2Provider(BaseProvider):
         @param public_ip: public_ip
         @type public_ip: C{str}
         """
-        if public_ip == '':
+        if public_ip == ('' or None):
             return
 
         for addr in self.conn.get_all_addresses(addresses = [public_ip]):
@@ -256,6 +256,7 @@ class EC2Provider(BaseProvider):
                 if instance.state == 'running':
                     flag = True
                     instance.terminate()
+                    self.release_public_ip(instance.ip_address)
 
                 elif instance.state != 'terminated':
                     flag = True
