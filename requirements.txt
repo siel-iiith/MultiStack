@@ -4,4 +4,4 @@ simplejson
 fabric
 requests
 boto==2.12.0
-
+python-novaclient

@@ -1,7 +1,8 @@
 from flask import current_app
 
 provider_map = {
-	'ec2': ['multistack.providers.ec2', 'EC2Provider']
+	'ec2': ['multistack.providers.ec2', 'EC2Provider'],
+	'openstack': ['multistack.providers.openstack', 'OpenStackProvider']
 }
 
 def get_cloud_provider(provider_name):

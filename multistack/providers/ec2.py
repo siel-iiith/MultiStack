@@ -67,7 +67,7 @@ class EC2Provider(BaseProvider):
         @param public_ip: public_ip
         @type public_ip: C{str}
         """
-        if public_ip == '':
+        if public_ip == ('' or None):
             return
 
         for addr in self.conn.get_all_addresses(addresses = [public_ip]):
@@ -77,15 +77,20 @@ class EC2Provider(BaseProvider):
                 addr.disassociate()
                 addr.release()
 
-    def boot_instances(self, 
-                        number, 
-                        keypair,
-                        security_groups,
-                        flavor,
-                        image_id
-                        ):
+    def boot_instances(
+                    self,
+                    name,
+                    number,
+                    keypair,
+                    security_groups,
+                    flavor,
+                    image_id
+                    ):
         """
-        Boot Instances
+        Boot Instances and Associate a Public IP with each
+
+        @param name: Name of the instance
+        @type name: string
 
         @param number: number of instances to boot
         @type number: int
@@ -99,21 +104,35 @@ class EC2Provider(BaseProvider):
         @param flavor: instance type
         @type flavor: string
 
-        @type image_id: image-id
+        @param image_id: image-id
         @type image_id: string
         """
+
+        servers = list()
+        server = dict()
 
         reservation = self.conn.run_instances(image_id, int(number), 
                                         int(number), keypair, security_groups,
                                         instance_type=flavor)
         
         for instance in reservation.instances:
+            instance.add_tag('Name', name)
             while instance.state == 'pending':
                 sleep(4)
                 current_app.logger.info("waiting for instance status to update")
                 instance.update()
 
-        return reservation
+        for instance in reservation.instances:
+            self.associate_public_ip(instance.id)
+            instance.update()
+            server['id'] = instance.id
+            server['private_ip_address'] = instance.private_ip_address
+            server['ip_address'] = instance.ip_address
+            server['flavor'] = instance.instance_type
+            server['role'] = name.split('-')[-1]
+            servers.append(server)
+
+        return servers
 
     def create_keypair(self, keypair_name, key_dir = '/tmp'):
         """
@@ -185,10 +204,10 @@ class EC2Provider(BaseProvider):
             to_port = -1,
             cidr_ip = "0.0.0.0/0")
 
-    def delete_keypair(self):
+    def delete_keypair(self, keypair_name):
         """Delete a Keypair"""
 
-        for keypair in self.conn.get_all_key_pairs(keynames = [self.keypair]):
+        for keypair in self.conn.get_all_key_pairs(keynames = [keypair_name]):
             keypair.delete()
 
     def delete_security_groups(self, security_groups):
@@ -237,6 +256,7 @@ class EC2Provider(BaseProvider):
                 if instance.state == 'running':
                     flag = True
                     instance.terminate()
+                    self.release_public_ip(instance.ip_address)
 
                 elif instance.state != 'terminated':
                     flag = True

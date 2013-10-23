@@ -6,7 +6,6 @@ from time import sleep
 from flask import current_app
     
 import multistack
-from multistack.dbOperations.db import get_node_objects
 from multistack.dbOperations.db import flush_data_to_mongo
 from multistack.providers import initiate_cloud
 from multistack.services.configuration import configure_cluster
@@ -41,28 +40,25 @@ def spawn(data, cloud):
 
     master = data['job']['master']
 
-    res_master = cloud.boot_instances(
-        1,
-        cloud.keypair,
-        [cloud.master_security_group],
-        flavor = master['flavor'],
-		image_id = image_id
-        )
-
-    current_app.cloud.associate_public_ip(res_master.instances[0].id)
-
-    data['job']['nodes'] += get_node_objects("master", res_master.id)
+    data['job']['nodes'] += cloud.boot_instances(
+                                        cloud.master_name,
+                                        1,
+                                        cloud.keypair,
+                                        [cloud.master_security_group],
+                                        flavor = master['flavor'],
+                                        image_id = image_id
+                                        )
     flush_data_to_mongo('job', data)
 
     for slave in data['job']['slaves']:
-        res_slave = cloud.boot_instances(
-            slave['instances'],
-            cloud.keypair,
-            [cloud.slave_security_group],
-            flavor = slave['flavor'],
-			image_id = image_id
-            )
-        data['job']['nodes'] += get_node_objects("slave", res_slave.id)
+        data['job']['nodes'] += cloud.boot_instances(
+                                                cloud.slave_name,
+                                                slave['instances'],
+                                                cloud.keypair,
+                                                [cloud.slave_security_group],
+                                                flavor = slave['flavor'],
+                                                image_id = image_id
+                                                )
         flush_data_to_mongo('job', data)
 
     return
@@ -123,18 +119,13 @@ def delete(cid, cloud):
     for node in job_info['nodes']:
         instance_ids.append(node['id'])
 
-    for addr in cloud.conn.get_all_addresses():
-        for node in job_info['nodes']:
-            if addr.instance_id == node['id']:
-                cloud.release_public_ip(addr.public_ip)
-
     current_app.logger.info("Released Addresses")
 
     cloud.terminate_instances(instance_ids)
 
     current_app.logger.info("Terminated Instances")
 
-    cloud.delete_keypair()
+    cloud.delete_keypair(cloud.keypair)
 
     current_app.logger.info("Deleted Keypairs")
 

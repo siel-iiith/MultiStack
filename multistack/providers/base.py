@@ -17,6 +17,8 @@ class BaseProvider:
 		self.keypair = ('multistack-{0}'.format(name))
 		self.master_security_group = ('multistack-{0}-master'.format(name))
 		self.slave_security_group = ('multistack-{0}-slave'.format(name))
+		self.master_name = self.master_security_group
+		self.slave_name = self.slave_security_group
 
 	def _connect(self, credentials):
 		raise NotImplementedError('Connect not implemented for this Provider')
