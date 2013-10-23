@@ -6,7 +6,6 @@ from time import sleep
 from flask import current_app
     
 import multistack
-from multistack.dbOperations.db import get_node_objects
 from multistack.dbOperations.db import flush_data_to_mongo
 from multistack.providers import initiate_cloud
 from multistack.services.configuration import configure_cluster
