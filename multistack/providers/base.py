@@ -23,9 +23,6 @@ class BaseProvider:
 	def _connect(self, credentials):
 		raise NotImplementedError('Connect not implemented for this Provider')
 
-	def get_all_addresses():
-		raise NotImplementedError
-
 	def boot_instances():
 		raise NotImplementedError
 
