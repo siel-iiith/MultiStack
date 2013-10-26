@@ -1,9 +1,5 @@
 from multistack.services.remote import Remote
-
-HADOOP_GID='123'
-HDFS_UID='201'
-MAPRED_UID='202'
-UMASK='0022'
+from multistack.constants import *
 
 def setup_s3fs(credentials, remote):
     """
@@ -38,6 +34,8 @@ def mount_bucket(bucket, remote):
     @type   remote: remote.Remote instance
     """
 
+    MAPRED_UID = remote.sudo("id -u mapred")
+    HADOOP_GID = remote.sudo("grep -i hadoop /etc/group | cut -d ':' -f 3")
     remote.sudo("mkdir /media/{0}".format(bucket))
     remote.sudo("chown root:hadoop -R /media/{0}".format(bucket))
     remote.sudo("chmod 775 -R /media/{0}".format(bucket))
