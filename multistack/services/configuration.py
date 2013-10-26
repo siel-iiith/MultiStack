@@ -70,7 +70,7 @@ def configure_master(ip_address, key_location, job_name, user,
     setup_chefserver_hostname(chef_server_hostname, chef_server_ip, remote)
 
     out = subprocess.Popen(("knife bootstrap {0} -x {1} -i {2} \
-            -N {3}-master --sudo -r 'recipe[multistack::master]' \
+            -N {3}-master --sudo -r 'recipe[multistack-cdh4::master]' \
             --no-host-key-verify".format(ip_address, user,
             key_location, job_name)).split(),
             stdout = subprocess.PIPE
@@ -93,7 +93,7 @@ def configure_slave(ip_address, key_location, job_name, user,
 
     out = subprocess.Popen((
         "knife bootstrap {0} -x {1} -i {2} \
-        -N {3}-slave-{4} --sudo -r 'recipe[multistack::slave]' \
+        -N {3}-slave-{4} --sudo -r 'recipe[multistack-cdh4::slave]' \
         --no-host-key-verify".format(ip_address,
             user, key_location, job_name,
             str(random.random()).split('.')[1])
