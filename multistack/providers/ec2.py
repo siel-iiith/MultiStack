@@ -123,7 +123,8 @@ class EC2Provider(BaseProvider):
                 instance.update()
 
         for instance in reservation.instances:
-            self.associate_public_ip(instance.id)
+            if instance.ip_address == None:
+                self.associate_public_ip(instance.id)
             instance.update()
             server['id'] = instance.id
             server['private_ip_address'] = instance.private_ip_address
